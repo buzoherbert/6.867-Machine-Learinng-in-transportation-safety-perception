@@ -4,6 +4,8 @@ library(NISTunits);
 # loading file
 safety_data = read.csv("safety_data.csv");
 
+# Based on
+# https://stackoverflow.com/a/365853/3128369
 haversine <- function(data, lat1, lon1, lat2, lon2){
   earthRadiusKm = 6371;
   
@@ -20,4 +22,6 @@ haversine <- function(data, lat1, lon1, lat2, lon2){
   return (distance);
 }
 
-safety_data.haversine = haversine(safety_data, "cetram_lat", "cetram_long", "latitude", "longitude")
+safety_data[["haversine"]] = haversine(safety_data, "cetram_lat", "cetram_long", "latitude", "longitude")
+
+# Making a basic plot of some potentially relevant variables
