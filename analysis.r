@@ -25,3 +25,16 @@ haversine <- function(data, lat1, lon1, lat2, lon2){
 safety_data[["haversine"]] = haversine(safety_data, "cetram_lat", "cetram_long", "latitude", "longitude")
 
 # Making a basic plot of some potentially relevant variables
+
+plot_data <- data.frame(
+  point_security = safety_data[["pointsecurity"]],
+  haversine = safety_data[["haversine"]],
+  gender = safety_data[["gender"]],
+  age = safety_data[["age"]],
+  companions = safety_data[["companions"]],  
+  education = safety_data[["educational_attainment"]]
+  
+                        );
+plot(plot_data)
+
+
