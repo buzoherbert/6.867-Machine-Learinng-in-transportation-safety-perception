@@ -1,8 +1,21 @@
 install.packages("NISTunits", dependencies = TRUE);
+install.packages("GGally", dependencies = TRUE);
+
 library(NISTunits);
+# Graphing library
+library(GGally)
+
 
 # loading file
 safety_data = read.csv("safety_data.csv");
+
+# Removing rows with no safety perception measurement
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+
+#safety_data = completeFun(safety_data, "pointsecurity")
 
 # Based on
 # https://stackoverflow.com/a/365853/3128369
@@ -35,6 +48,9 @@ plot_data <- data.frame(
   education = safety_data[["educational_attainment"]]
   
                         );
-plot(plot_data)
+# Getting a summary of the data
+summary(plot_data)
 
+# plotting the data
+ggpairs(plot_data,)
 
