@@ -1,23 +1,19 @@
 install.packages("NISTunits", dependencies = TRUE);
 install.packages("GGally", dependencies = TRUE);
 install.packages("ggplot2", dependencies = TRUE);
-install.packages("lubridate", dependencies = TRUE);
+
 
 library(NISTunits);
 # Graphing library
-library(GGally);
-library(ggplot2);
+# library(GGally);
+# library(ggplot2);
 # For parsing dates
 library(lubridate);
 
 
 # install.packages("GGally", dependencies = TRUE);
-
-library(NISTunits);
 # Graphing library
 # library(GGally)
->>>>>>> origin/master
-
 
 # loading file
 safety_data = read.csv("safety_data.csv");
@@ -60,7 +56,7 @@ plot_data <- data.frame(
   companions = safety_data[["companions"]],  
   education = safety_data[["educational_attainment"]],
   trip_purpose = safety_data[["trip_purpose"]],
-  #time = as.Date(safety_data[["time"]]),
+  time = safety_data[["time"]],
   base_study_zone = safety_data[["base_study_zone"]],
   busdestination = safety_data[["busdestination"]],
   inside_or_outside = safety_data[["inside_or_outside"]]
@@ -70,14 +66,14 @@ plot_data <- data.frame(
 
 times = strptime(plot_data$time, "%I:%M:%S %p");
 
-plot_data$hour = hour(times);
-
+plot_data$hour = as.factor(hour(times));
+plot_data = subset(plot_data, select = -c(time) )
 # Getting a summary of the data
-summary(plot_data)
+# summary(plot_data)
 
 # plotting the data
 
-ggpairs(plot_data, mapping = aes(color = point_security))
+# ggpairs(plot_data, mapping = aes(color = point_security))
 
 
 # ggpairs(plot_data,)
