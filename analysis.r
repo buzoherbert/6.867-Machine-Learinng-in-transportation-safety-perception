@@ -1,9 +1,9 @@
 install.packages("NISTunits", dependencies = TRUE);
-install.packages("GGally", dependencies = TRUE);
+# install.packages("GGally", dependencies = TRUE);
 
 library(NISTunits);
 # Graphing library
-library(GGally)
+# library(GGally)
 
 
 # loading file
@@ -47,15 +47,25 @@ plot_data <- data.frame(
   companions = safety_data[["companions"]],  
   education = safety_data[["educational_attainment"]],
   trip_purpose = safety_data[["trip_purpose"]],
-  time = safety_data[["time"]],
+  # time = safety_data[["time"]],
   base_study_zone = safety_data[["base_study_zone"]],
   busdestination = safety_data[["busdestination"]],
   inside_or_outside = safety_data[["inside_or_outside"]]
-  
                         );
 # Getting a summary of the data
 summary(plot_data)
 
 # plotting the data
-ggpairs(plot_data,)
+# ggpairs(plot_data,)
+
+set.seed(888)
+smp_size <- floor(0.75*nrow(plot_data))
+train_data <- sample(seq_len(nrow(plot_data)), size = smp_size)
+train <- plot_data[train_data,]
+test <- plot_data[-train_data,]
+linear_model = lm(train$point_security~., data = train)
+summary(linear_model)
+
+linear_model2 = lm(train$point_security~ +haversine +gender +companions +education +base_study_zone +busdestination +inside_or_outside, data = train)
+summary(linear_model2)
 
