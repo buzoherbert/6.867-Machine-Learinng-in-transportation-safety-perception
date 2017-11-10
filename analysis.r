@@ -1,15 +1,14 @@
 install.packages("NISTunits", dependencies = TRUE);
 install.packages("GGally", dependencies = TRUE);
 install.packages("ggplot2", dependencies = TRUE);
-install.packages("lubridate", dependencies = TRUE);
+
 
 library(NISTunits);
 # Graphing library
-library(GGally);
-library(ggplot2);
+ library(GGally);
+ library(ggplot2);
 # For parsing dates
 library(lubridate);
-
 
 # loading file
 safety_data = read.csv("safety_data.csv");
@@ -85,19 +84,13 @@ for(i in names(plot_data)){
 plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
 
 
-
-
-
 # Getting a summary of the data
-summary(plot_data)
+# summary(plot_data)
 
 # plotting the data
 to_plot = plot_data;
 to_plot$point_security = as.factor(to_plot$point_security)
 ggpairs(to_plot, mapping = aes(color = point_security))
-
-
-# ggpairs(plot_data,)
 
 
 ########################
@@ -114,3 +107,10 @@ summary(linear_model)
 linear_model2 = lm(train$point_security~ +haversine +gender +companions +education +base_study_zone +busdestination +inside_or_outside, data = train)
 summary(linear_model2)
 
+pred_data = predict(linear_model2, newdata = test)
+SSE = sum((pred_data - test$point_security)^2)
+pred_mean = mean(train$point_security)
+SST = sum((pred_mean - test$point_security)^2)
+OSR2 = 1-SSE/SST
+RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test))
+MAE = sum(abs(pred_data - test$point_security))/nrow(test)
