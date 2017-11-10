@@ -43,10 +43,12 @@ safety_data[["haversine"]] = haversine(safety_data, "cetram_lat", "cetram_long",
 
 # get hours
 
-times = strptime(safety_data$time, "%I:%M:%S %p");
+times = strptime(safety_data$date, "%m/%d/%Y");
 
 safety_data$hour = as.factor(hour(times));
-safety_data = subset(safety_data, select = -c(time) )
+
+# Get day of the week
+safety_data$wday = wday(as.Date(times), label=TRUE)
 
 # Making a basic plot of some potentially relevant variables
 
@@ -73,7 +75,8 @@ plot_data <- data.frame(
   least_safe = safety_data[["leastsafe"]],
   urban_typology = safety_data[["urban.typology"]],
   haversine = safety_data[["haversine"]],
-  hour = safety_data[["hour"]]
+  hour = safety_data[["hour"]],
+  week_day = safety_data[["wday"]]
 );
 
 # Treating all the variables as categorical
@@ -82,6 +85,7 @@ for(i in names(plot_data)){
 }
 
 plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
+plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]])
 
 
 # Getting a summary of the data
