@@ -45,7 +45,12 @@ plot_data <- data.frame(
   gender = safety_data[["gender"]],
   age = safety_data[["age"]],
   companions = safety_data[["companions"]],  
-  education = safety_data[["educational_attainment"]]
+  education = safety_data[["educational_attainment"]],
+  trip_purpose = safety_data[["trip_purpose"]],
+  time = safety_data[["time"]],
+  base_study_zone = safety_data[["base_study_zone"]],
+  busdestination = safety_data[["busdestination"]],
+  inside_or_outside = safety_data[["inside_or_outside"]]
   
                         );
 # Getting a summary of the data
