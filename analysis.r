@@ -1,9 +1,14 @@
 install.packages("NISTunits", dependencies = TRUE);
 install.packages("GGally", dependencies = TRUE);
+install.packages("ggplot2", dependencies = TRUE);
+install.packages("lubridate", dependencies = TRUE);
 
 library(NISTunits);
 # Graphing library
-library(GGally)
+library(GGally);
+library(ggplot2);
+library(lubridate);
+
 
 
 # loading file
@@ -15,7 +20,7 @@ completeFun <- function(data, desiredCols) {
   return(data[completeVec, ])
 }
 
-#safety_data = completeFun(safety_data, "pointsecurity")
+safety_data = completeFun(safety_data, "pointsecurity")
 
 # Based on
 # https://stackoverflow.com/a/365853/3128369
@@ -47,15 +52,24 @@ plot_data <- data.frame(
   companions = safety_data[["companions"]],  
   education = safety_data[["educational_attainment"]],
   trip_purpose = safety_data[["trip_purpose"]],
-  time = safety_data[["time"]],
+  #time = as.Date(safety_data[["time"]]),
   base_study_zone = safety_data[["base_study_zone"]],
   busdestination = safety_data[["busdestination"]],
   inside_or_outside = safety_data[["inside_or_outside"]]
-  
-                        );
+  );
+
+# get hours
+
+times = strptime(plot_data$time, "%I:%M:%S %p");
+
+plot_data$hour = hour(times);
+
+
 # Getting a summary of the data
 summary(plot_data)
 
 # plotting the data
-ggpairs(plot_data,)
+ggpairs(plot_data, mapping = aes(color = point_security))
+
+
 
