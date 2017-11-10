@@ -93,3 +93,10 @@ summary(linear_model)
 linear_model2 = lm(train$point_security~ +haversine +gender +companions +education +base_study_zone +busdestination +inside_or_outside, data = train)
 summary(linear_model2)
 
+pred_data = predict(linear_model2, newdata = test)
+SSE = sum((pred_data - test$point_security)^2)
+pred_mean = mean(train$point_security)
+SST = sum((pred_mean - test$point_security)^2)
+OSR2 = 1-SSE/SST
+RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test))
+MAE = sum(abs(pred_data - test$point_security))/nrow(test)
