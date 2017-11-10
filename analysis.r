@@ -7,8 +7,16 @@ library(NISTunits);
 # Graphing library
 library(GGally);
 library(ggplot2);
+# For parsing dates
 library(lubridate);
 
+
+# install.packages("GGally", dependencies = TRUE);
+
+library(NISTunits);
+# Graphing library
+# library(GGally)
+>>>>>>> origin/master
 
 
 # loading file
@@ -64,12 +72,28 @@ times = strptime(plot_data$time, "%I:%M:%S %p");
 
 plot_data$hour = hour(times);
 
-
 # Getting a summary of the data
 summary(plot_data)
 
 # plotting the data
+
 ggpairs(plot_data, mapping = aes(color = point_security))
 
 
+# ggpairs(plot_data,)
+
+
+########################
+## Linear regression model
+
+set.seed(888)
+smp_size <- floor(0.75*nrow(plot_data))
+train_data <- sample(seq_len(nrow(plot_data)), size = smp_size)
+train <- plot_data[train_data,]
+test <- plot_data[-train_data,]
+linear_model = lm(train$point_security~., data = train)
+summary(linear_model)
+
+linear_model2 = lm(train$point_security~ +haversine +gender +companions +education +base_study_zone +busdestination +inside_or_outside, data = train)
+summary(linear_model2)
 
