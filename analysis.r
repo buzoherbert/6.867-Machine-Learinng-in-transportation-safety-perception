@@ -41,12 +41,6 @@ haversine <- function(data, lat1, lon1, lat2, lon2){
 
 safety_data[["haversine"]] = haversine(safety_data, "cetram_lat", "cetram_long", "latitude", "longitude")
 
-# get hours
-
-times = strptime(safety_data$date, "%m/%d/%Y");
-
-safety_data$hour = as.factor(hour(times));
-
 # Get day of the week
 safety_data$wday = wday(as.Date(times), label=TRUE)
 
@@ -84,8 +78,13 @@ for(i in names(plot_data)){
   plot_data[[i]] <- as.factor(plot_data[[i]])
 }
 
-plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
-plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]])
+# Some fields have to be treated as numeric.
+# TODO improve this so we don't convert the data twice.
+plot_data[["totalfemalecount"]] = as.numeric(as.character(plot_data[["totalfemalecount"]]));
+plot_data[["totalpassengercount"]] = as.numeric(as.character(plot_data[["totalpassengercount"]]));
+plot_data[["emptyseats"]] = as.numeric(as.character(plot_data[["emptyseats"]]));
+plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]));
+plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]]);
 
 
 # Getting a summary of the data
