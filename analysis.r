@@ -19,7 +19,7 @@ library("caTools");
 library(magrittr);
 
 # loading file
-safety_data = read.csv("safety_data.csv");
+safety_data <- read.table(file="safety_data.csv", header = TRUE, na.strings=c("", "NA"), sep=",")
 
 # Removing rows with no safety perception measurement
 completeFun <- function(data, desiredCols) {
