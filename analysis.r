@@ -58,7 +58,6 @@ safety_data$wday = wday(as.Date(times), label=FALSE);
 
 plot_data <- data.frame(
   # Type of survey
-  bus_or_ped = safety_data[["bus_or_ped"]],
   inside_or_outside = safety_data[["inside_or_outside"]],
   
   # Sociodemographic data
@@ -80,6 +79,7 @@ plot_data <- data.frame(
   least_safe = safety_data[["leastsafe"]],
   
   # Context data
+  bus_or_ped = safety_data[["bus_or_ped"]],
   base_study_zone = safety_data[["base_study_zone"]],
   busdestination = safety_data[["busdestination"]],  
   total_seats = safety_data[["totalseats"]],
@@ -118,9 +118,9 @@ plot_data = na.omit(plot_data)
 # summary(plot_data)
 
 # plotting the data
-to_plot = plot_data;
-to_plot$point_security = as.factor(to_plot$point_security)
-ggpairs(to_plot, mapping = aes(color = point_security))
+#to_plot = plot_data;
+#to_plot$point_security = as.factor(to_plot$point_security)
+#ggpairs(to_plot, mapping = aes(color = point_security))
 
 ########################
 ## Creating train and testing sets
@@ -132,7 +132,98 @@ train_ind <- sample(seq_len(nrow(plot_data)), size = smp_size)
 
 train <- plot_data[train_ind, ]
 test <- plot_data[-train_ind, ]
+# Removing categories not on the training set
+# Residual standard error: 1.092 on 550 degrees of freedom
+# Multiple R-squared:  0.416,	Adjusted R-squared:  0.2727 
+# F-statistic: 2.902 on 135 and 550 DF,  p-value: < 2.2e-16
 
+# Funtion to remove misssing levels from fields in a testing dataframe
+# Source: https://stackoverflow.com/a/44316204/3128369
+#' @title remove_missing_levels
+#' @description Accounts for missing factor levels present only in test data
+#' but not in train data by setting values to NA
+#'
+#' @import magrittr
+#' @importFrom gdata unmatrix
+#' @importFrom stringr str_split
+#'
+#' @param fit fitted model on training data
+#'
+#' @param test_data data to make predictions for
+#'
+#' @return data.frame with matching factor levels to fitted model
+#'
+#' @keywords internal
+#'
+#' @export
+remove_missing_levels <- function(fit, test_data) {
+  
+  # https://stackoverflow.com/a/39495480/4185785
+  
+  # drop empty factor levels in test data
+  test_data %>%
+    droplevels() %>%
+    as.data.frame() -> test_data
+  
+  # 'fit' object structure of 'lm' and 'glmmPQL' is different so we need to
+  # account for it
+  if (any(class(fit) == "glmmPQL")) {
+    # Obtain factor predictors in the model and their levels
+    factors <- (gsub("[-^0-9]|as.factor|\\(|\\)", "",
+                     names(unlist(fit$contrasts))))
+    # do nothing if no factors are present
+    if (length(factors) == 0) {
+      return(test_data)
+    }
+    
+    map(fit$contrasts, function(x) names(unmatrix(x))) %>%
+      unlist() -> factor_levels
+    factor_levels %>% str_split(":", simplify = TRUE) %>%
+      extract(, 1) -> factor_levels
+    
+    model_factors <- as.data.frame(cbind(factors, factor_levels))
+  } else {
+    # Obtain factor predictors in the model and their levels
+    factors <- (gsub("[-^0-9]|as.factor|\\(|\\)", "",
+                     names(unlist(fit$xlevels))))
+    # do nothing if no factors are present
+    if (length(factors) == 0) {
+      return(test_data)
+    }
+    
+    factor_levels <- unname(unlist(fit$xlevels))
+    model_factors <- as.data.frame(cbind(factors, factor_levels))
+  }
+  
+  # Select column names in test data that are factor predictors in
+  # trained model
+  
+  predictors <- names(test_data[names(test_data) %in% factors])
+  
+  # For each factor predictor in your data, if the level is not in the model,
+  # set the value to NA
+  
+  for (i in 1:length(predictors)) {
+    found <- test_data[, predictors[i]] %in% model_factors[
+      model_factors$factors == predictors[i], ]$factor_levels
+    if (any(!found)) {
+      # track which variable
+      var <- predictors[i]
+      # set to NA
+      test_data[!found, predictors[i]] <- NA
+      # drop empty factor levels in test data
+      test_data %>%
+        droplevels() -> test_data
+      # issue warning to console
+      message(sprintf(paste0("Setting missing levels in '%s', only present",
+                             " in test data but missing in train data,",
+                             " to 'NA'."),
+                      var))
+    }
+  }
+  return(test_data)
+}
+test = na.omit(remove_missing_levels (fit=linear_model, test_data=test));
 
 
 ########################
@@ -142,18 +233,18 @@ test <- plot_data[-train_ind, ]
 linear_model = lm(train$point_security~., data = train)
 summary(linear_model)
 
-Call:
+#Call:
   # lm(formula = train$point_security ~ ., data = train)
   
   # Residuals:
-  #     Min      1Q  Median      3Q     Max 
-  # -3.3654 -0.7034  0.0000  0.6053  2.9270 
+#     Min      1Q  Median      3Q     Max 
+# -3.3654 -0.7034  0.0000  0.6053  2.9270 
   
-  # Coefficients: (5 not defined because of singularities)
-  #                                     Estimate Std. Error t value Pr(>|t|)    
-  # (Intercept)                        2.806e+00  1.760e+00   1.594  0.11147    
-  # bus_or_pedVan                      3.207e-02  1.963e-01   0.163  0.87027    
-  # inside_or_outsideFuera CETRAM     -1.010e-01  1.249e-01  -0.809  0.41913    
+# Coefficients: (5 not defined because of singularities)
+#                                     Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                        2.806e+00  1.760e+00   1.594  0.11147    
+# bus_or_pedVan                      3.207e-02  1.963e-01   0.163  0.87027    
+# inside_or_outsideFuera CETRAM     -1.010e-01  1.249e-01  -0.809  0.41913    
 # gendermale                        -6.937e-03  9.816e-02  -0.071  0.94368    
 # age0-17                            1.127e+00  7.030e-01   1.603  0.10948    
 # age18-24                           9.922e-01  6.855e-01   1.447  0.14834    
@@ -295,99 +386,13 @@ Call:
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.092 on 550 degrees of freedom
-# Multiple R-squared:  0.416,	Adjusted R-squared:  0.2727 
-# F-statistic: 2.902 on 135 and 550 DF,  p-value: < 2.2e-16
+pred_data = predict(linear_model, newdata = test);
 
-# Funtion to remove misssing levels from fields in a testing dataframe
-# Source: https://stackoverflow.com/a/44316204/3128369
-#' @title remove_missing_levels
-#' @description Accounts for missing factor levels present only in test data
-#' but not in train data by setting values to NA
-#'
-#' @import magrittr
-#' @importFrom gdata unmatrix
-#' @importFrom stringr str_split
-#'
-#' @param fit fitted model on training data
-#'
-#' @param test_data data to make predictions for
-#'
-#' @return data.frame with matching factor levels to fitted model
-#'
-#' @keywords internal
-#'
-#' @export
-remove_missing_levels <- function(fit, test_data) {
-  
-  # https://stackoverflow.com/a/39495480/4185785
-  
-  # drop empty factor levels in test data
-  test_data %>%
-    droplevels() %>%
-    as.data.frame() -> test_data
-  
-  # 'fit' object structure of 'lm' and 'glmmPQL' is different so we need to
-  # account for it
-  if (any(class(fit) == "glmmPQL")) {
-    # Obtain factor predictors in the model and their levels
-    factors <- (gsub("[-^0-9]|as.factor|\\(|\\)", "",
-                     names(unlist(fit$contrasts))))
-    # do nothing if no factors are present
-    if (length(factors) == 0) {
-      return(test_data)
-    }
-    
-    map(fit$contrasts, function(x) names(unmatrix(x))) %>%
-      unlist() -> factor_levels
-    factor_levels %>% str_split(":", simplify = TRUE) %>%
-      extract(, 1) -> factor_levels
-    
-    model_factors <- as.data.frame(cbind(factors, factor_levels))
-  } else {
-    # Obtain factor predictors in the model and their levels
-    factors <- (gsub("[-^0-9]|as.factor|\\(|\\)", "",
-                     names(unlist(fit$xlevels))))
-    # do nothing if no factors are present
-    if (length(factors) == 0) {
-      return(test_data)
-    }
-    
-    factor_levels <- unname(unlist(fit$xlevels))
-    model_factors <- as.data.frame(cbind(factors, factor_levels))
-  }
-  
-  # Select column names in test data that are factor predictors in
-  # trained model
-  
-  predictors <- names(test_data[names(test_data) %in% factors])
-  
-  # For each factor predictor in your data, if the level is not in the model,
-  # set the value to NA
-  
-  for (i in 1:length(predictors)) {
-    found <- test_data[, predictors[i]] %in% model_factors[
-      model_factors$factors == predictors[i], ]$factor_levels
-    if (any(!found)) {
-      # track which variable
-      var <- predictors[i]
-      # set to NA
-      test_data[!found, predictors[i]] <- NA
-      # drop empty factor levels in test data
-      test_data %>%
-        droplevels() -> test_data
-      # issue warning to console
-      message(sprintf(paste0("Setting missing levels in '%s', only present",
-                             " in test data but missing in train data,",
-                             " to 'NA'."),
-                      var))
-    }
-  }
-  return(test_data)
-}
+# Data frame for summaries
+summaries <- data.frame(matrix(ncol = 7, nrow = 0))
+names <- c("model", "sse", "pred_means", "sst", "osr2", "rmse", "mae")
+colnames(summaries) <- names
 
-
-pred_data = predict(linear_model, newdata = remove_missing_levels (fit=linear_model, test_data=test));
 SSE = sum((pred_data - test$point_security)^2);
 pred_mean = mean(train$point_security);
 SST = sum((pred_mean - test$point_security)^2);
@@ -395,8 +400,14 @@ OSR2 = 1-SSE/SST;
 RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
 MAE = sum(abs(pred_data - test$point_security))/nrow(test);
 
-
-
+i = 1;
+summaries[i, "model"] = "Initial model";
+summaries[i, "sse"] = SSE;
+summaries[i, "pred_means"] = pred_mean;
+summaries[i, "sst"] = SST;
+summaries[i, "osr2"] = OSR2;
+summaries[i, "rmse"] = RMSE;
+summaries[i, "mae"] = MAE;
 
 
 # Taking out the least relevant variables
@@ -405,6 +416,23 @@ linear_model2 = lm(train$point_security~.
                    -companions - truo_purpose -importance_safety -least_safe
                    -hour -week_day, data = train)
 summary(linear_model2)
+
+
+SSE = sum((pred_data - test$point_security)^2);
+pred_mean = mean(train$point_security);
+SST = sum((pred_mean - test$point_security)^2);
+OSR2 = 1-SSE/SST;
+RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
+MAE = sum(abs(pred_data - test$point_security))/nrow(test);
+
+i = 1;
+summaries[i, "model"] = "Initial model";
+summaries[i, "sse"] = SSE;
+summaries[i, "pred_means"] = pred_mean;
+summaries[i, "sst"] = SST;
+summaries[i, "osr2"] = OSR2;
+summaries[i, "rmse"] = RMSE;
+summaries[i, "mae"] = MAE;
 
 
 
