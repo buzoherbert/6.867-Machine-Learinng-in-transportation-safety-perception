@@ -384,6 +384,52 @@ summary(linear_model)
 # week_day7                         -3.865e-01  2.122e-01  -1.821  0.06908 .  
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Function to get the metrics of each model and add it to the summaries table
+# It returns the summaries table passed to it with added data about the new model
+# If summaries table doesn't exist, it creates it
+getModelMetrics <- function(model_name, linear_model, summaries_table, train_data, test_data) {
+  
+  # If the summaries table is not a data frame, it gets initialized
+  if(!is.data.frame(summaries_table)){
+    summaries_table <- data.frame(matrix(ncol = 9, nrow = 0));
+    names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num");
+    colnames(summaries_table) <- names;
+  }
+  
+  
+  pred_data = predict(linear_model, newdata = test_data);
+  SSE = sum((pred_data - test_data$point_security)^2);
+  pred_mean = mean(train_data$point_security);
+  SST = sum((pred_mean - test_data$point_security)^2);
+  OSR2 = 1-SSE/SST;
+  RMSE = sqrt(sum((pred_data - test_data$point_security)^2)/nrow(test_data));
+  MAE = sum(abs(pred_data - test_data$point_security))/nrow(test_data);
+  
+  
+  i = nrow(summaries_table) + 1;
+  summaries_table[i, "model"] = model_name;
+  summaries_table[i, "r2"] = summary(linear_model)$r.squared;
+  summaries_table[i, "sse"] = SSE;
+  summaries_table[i, "pred_means"] = pred_mean;
+  summaries_table[i, "sst"] = SST;
+  summaries_table[i, "osr2"] = OSR2;
+  summaries_table[i, "rmse"] = RMSE;
+  summaries_table[i, "mae"] = MAE;
+  summaries_table[i,"var_num"] = length(names(linear_model$coefficients));
+  
+  return(summaries_table);
+}
+
+summaries = getModelMetrics("Initial model",linear_model, summaries, train, test);
+
+
+
+
+
+
+
+
 test = na.omit(remove_missing_levels (fit=linear_model, test_data=test));
 pred_data = predict(linear_model, newdata = test);
 
