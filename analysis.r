@@ -389,6 +389,7 @@ summary(linear_model)
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
 getModelMetrics <- function(model_name, linear_model, summaries_table, train_data, test_data) {
+  test_data = na.omit(remove_missing_levels (fit=linear_model, test_data=test_data));
   
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
@@ -423,41 +424,6 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
 
 summaries = getModelMetrics("Initial model",linear_model, summaries, train, test);
 
-
-
-
-
-
-
-
-test = na.omit(remove_missing_levels (fit=linear_model, test_data=test));
-pred_data = predict(linear_model, newdata = test);
-
-# Data frame for summaries
-summaries <- data.frame(matrix(ncol = 9, nrow = 0))
-names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num")
-colnames(summaries) <- names
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model;
-i = 1;
-summaries[i, "model"] = "Initial model";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
-
 # Taking out the least relevant variables
 linear_model2 = lm(train$point_security~. 
                    -bus_or_ped -inside_or_outside -gender -age -education 
@@ -466,9 +432,10 @@ linear_model2 = lm(train$point_security~.
                    -base_study_zone -total_seats -haversine
                    -hour, data = train)
 summary(linear_model2);
+summaries = getModelMetrics("Relevant variables",linear_model2, summaries, train, test);
 
 
-Call:
+#Call:
   # lm(formula = train$point_security ~ . - bus_or_ped - inside_or_outside - 
   #     gender - age - education - companions - trip_purpose - importance_safety - 
   #     least_safe - total_passenger_count - total_female_count - 
@@ -581,34 +548,11 @@ Call:
 # F-statistic: 3.932 on 90 and 595 DF,  p-value: < 2.2e-16
 
 
-pred_data = predict(linear_model2, newdata = test);
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model2;
-i = i+1;
-summaries[i, "model"] = "Only significant variables";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
-
-
-
 # Only trip variables
 
 linear_model3 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
 summary(linear_model3)
+summaries = getModelMetrics("Trip variables",linear_model3, summaries, train, test);
 
 
 #Call:
@@ -701,36 +645,11 @@ summary(linear_model3)
 # Multiple R-squared:  0.1793,	Adjusted R-squared:  0.08438 
 # F-statistic: 1.889 on 71 and 614 DF,  p-value: 4.017e-05
 
-
-
-
-pred_data = predict(linear_model3, newdata = test);
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model3;
-i = i+1;
-summaries[i, "model"] = "Only trip variables";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
-
-
 # Only perception variables
 
 linear_model4 = lm(train$point_security~ +mode_security +importance_safety +most_safe +least_safe, data = train)
 summary(linear_model4)
+summaries = getModelMetrics("Perception variables",linear_model4, summaries, train, test);
 
 # Call:
 # lm(formula = train$point_security ~ +mode_security + importance_safety + 
@@ -769,32 +688,11 @@ summary(linear_model4)
 # Multiple R-squared:  0.2097,	Adjusted R-squared:  0.1871 
 # F-statistic: 9.299 on 19 and 666 DF,  p-value: < 2.2e-16
 
-pred_data = predict(linear_model4, newdata = test);
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model4;
-i = i+1;
-summaries[i, "model"] = "Only perception variables";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
-
 #Only  instant contextual information
 linear_model5 = lm(train$point_security~ +haversine +urban_typology +total_passenger_count
                    +total_female_count +empty_seats +hour +week_day, data = train)
-summary(linear_model5)
+summary(linear_model5);
+summaries = getModelMetrics("Instant contextual information",linear_model5, summaries, train, test);
 
 # Call:
 # lm(formula = train$point_security ~ +haversine + urban_typology + 
@@ -843,30 +741,10 @@ summary(linear_model5)
 # Multiple R-squared:  0.116,	Adjusted R-squared:  0.07831 
 # F-statistic: 3.079 on 28 and 657 DF,  p-value: 2.74e-07
 
-pred_data = predict(linear_model5, newdata = test);
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model5;
-i = i+1;
-summaries[i, "model"] = "Only instant contextual information";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
 # Only sociodemographic data
 linear_model6 = lm(train$point_security~ +age +gender +education, data = train)
 summary(linear_model6)
+summaries = getModelMetrics("Sociodemographic data",linear_model6, summaries, train, test);
 
 # Call:
 # lm(formula = train$point_security ~ +age + gender + education, 
@@ -898,30 +776,10 @@ summary(linear_model6)
 # Multiple R-squared:  0.01225,	Adjusted R-squared:  -0.005363 
 # F-statistic: 0.6955 on 12 and 673 DF,  p-value: 0.7567
 
-pred_data = predict(linear_model6, newdata = test);
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model6;
-i = i+1;
-summaries[i, "model"] = "Only sociodemographic data";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
 # Only personal trip information
 linear_model7 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
 summary(linear_model7)
+summaries = getModelMetrics("Personal trip information",linear_model7, summaries, train, test);
 
 # Call:
 # lm(formula = train$point_security ~ +origin + destination + companions + 
@@ -1012,30 +870,6 @@ summary(linear_model7)
 # Residual standard error: 1.225 on 614 degrees of freedom
 # Multiple R-squared:  0.1793,	Adjusted R-squared:  0.08438 
 # F-statistic: 1.889 on 71 and 614 DF,  p-value: 4.017e-05
-
-pred_data = predict(linear_model7, newdata = test);
-
-SSE = sum((pred_data - test$point_security)^2);
-pred_mean = mean(train$point_security);
-SST = sum((pred_mean - test$point_security)^2);
-OSR2 = 1-SSE/SST;
-RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
-MAE = sum(abs(pred_data - test$point_security))/nrow(test);
-
-current_model = linear_model7;
-i = i+1;
-summaries[i, "model"] = "Only personal trip data";
-summaries[i, "r2"] = summary(current_model)$r.squared
-summaries[i, "sse"] = SSE;
-summaries[i, "pred_means"] = pred_mean;
-summaries[i, "sst"] = SST;
-summaries[i, "osr2"] = OSR2;
-summaries[i, "rmse"] = RMSE;
-summaries[i, "mae"] = MAE;
-summaries[i,"var_num"] = length(names(current_model$coefficients));
-
-
-
 
 
 
