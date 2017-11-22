@@ -389,8 +389,8 @@ summary(linear_model)
 pred_data = predict(linear_model, newdata = test);
 
 # Data frame for summaries
-summaries <- data.frame(matrix(ncol = 7, nrow = 0))
-names <- c("model", "sse", "pred_means", "sst", "osr2", "rmse", "mae")
+summaries <- data.frame(matrix(ncol = 9, nrow = 0))
+names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num")
 colnames(summaries) <- names
 
 SSE = sum((pred_data - test$point_security)^2);
@@ -400,23 +400,29 @@ OSR2 = 1-SSE/SST;
 RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
 MAE = sum(abs(pred_data - test$point_security))/nrow(test);
 
+current_model = linear_model;
 i = 1;
 summaries[i, "model"] = "Initial model";
+summaries[i, "r2"] = summary(current_model)$r.squared
 summaries[i, "sse"] = SSE;
 summaries[i, "pred_means"] = pred_mean;
 summaries[i, "sst"] = SST;
 summaries[i, "osr2"] = OSR2;
 summaries[i, "rmse"] = RMSE;
 summaries[i, "mae"] = MAE;
+summaries[i,"var_num"] = length(names(current_model$coefficients));
 
 
 # Taking out the least relevant variables
 linear_model2 = lm(train$point_security~. 
                    -bus_or_ped -inside_or_outside -gender -age -education 
-                   -companions - truo_purpose -importance_safety -least_safe
-                   -hour -week_day, data = train)
-summary(linear_model2)
+                   -companions - trip_purpose -importance_safety -least_safe
+                   -total_passenger_count -total_female_count -empty_seats
+                   -base_study_zone -total_seats -haversine
+                   -hour, data = train)
+summary(linear_model2);
 
+pred_data = predict(linear_model2, newdata = test);
 
 SSE = sum((pred_data - test$point_security)^2);
 pred_mean = mean(train$point_security);
@@ -425,14 +431,17 @@ OSR2 = 1-SSE/SST;
 RMSE = sqrt(sum((pred_data - test$point_security)^2)/nrow(test));
 MAE = sum(abs(pred_data - test$point_security))/nrow(test);
 
-i = 1;
-summaries[i, "model"] = "Initial model";
+current_model = linear_model2;
+#i = i+1;
+summaries[i, "model"] = "Only significant variables";
+summaries[i, "r2"] = summary(current_model)$r.squared
 summaries[i, "sse"] = SSE;
 summaries[i, "pred_means"] = pred_mean;
 summaries[i, "sst"] = SST;
 summaries[i, "osr2"] = OSR2;
 summaries[i, "rmse"] = RMSE;
 summaries[i, "mae"] = MAE;
+summaries[i,"var_num"] = length(names(current_model$coefficients));
 
 
 
