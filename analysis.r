@@ -52,30 +52,44 @@ safety_data$wday = wday(as.Date(times), label=FALSE);
 # Making a basic plot of some potentially relevant variables
 
 plot_data <- data.frame(
+  # Type of survey
   bus_or_ped = safety_data[["bus_or_ped"]],
-  base_study_zone = safety_data[["base_study_zone"]],
-  busdestination = safety_data[["busdestination"]],
   inside_or_outside = safety_data[["inside_or_outside"]],
-  total_seats = safety_data[["totalseats"]],
-  total_passenger_count = safety_data[["totalpassengercount"]],
-  total_female_count = safety_data[["totalfemalecount"]],
-  empty_seats = safety_data[["emptyseats"]],
+  
+  # Sociodemographic data
   gender = safety_data[["gender"]],
   age = safety_data[["age"]],
-  companions = safety_data[["companions"]],  
   education = safety_data[["educational_attainment"]],
+  
+  # Personal trip related data
   origin = safety_data[["origin"]],
   destination = safety_data[["destinations"]],
+  companions = safety_data[["companions"]],  
   trip_purpose = safety_data[["trip_purpose"]],
+
+  # Perception data
   mode_security = safety_data[["modesecurity"]],
   point_security = safety_data[["pointsecurity"]],
   importance_safety = safety_data[["Importance_safety_digit"]],
   most_safe = safety_data[["mostsafe"]],
   least_safe = safety_data[["leastsafe"]],
-  urban_typology = safety_data[["urban.typology"]],
+  
+  # Context data
+  base_study_zone = safety_data[["base_study_zone"]],
+  busdestination = safety_data[["busdestination"]],  
+  total_seats = safety_data[["totalseats"]],
+  
+
+  # Time related contextual information
   haversine = safety_data[["haversine"]],
+  urban_typology = safety_data[["urban.typology"]],
+  total_passenger_count = safety_data[["totalpassengercount"]],
+  total_female_count = safety_data[["totalfemalecount"]],
+  empty_seats = safety_data[["emptyseats"]],
   hour = safety_data[["hour"]],
   week_day = safety_data[["wday"]]
+  
+  
 );
 
 # Treating all the variables as categorical
