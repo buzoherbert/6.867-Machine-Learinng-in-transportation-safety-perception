@@ -3,7 +3,7 @@ install.packages("GGally", dependencies = TRUE);
 install.packages("ggplot2", dependencies = TRUE);
 install.packages("caTools", dependencies = TRUE);
 install.packages("magrittr")
-
+install.packages("class")
 
 library(NISTunits);
 # Graphing library
@@ -17,6 +17,9 @@ library("caTools");
 
 # For removing unused levels in test data
 library(magrittr);
+
+# For knn model
+library("class")
 
 # loading file
 safety_data <- read.table(file="safety_data.csv", header = TRUE, na.strings=c("", "NA"), sep=",")
@@ -883,8 +886,33 @@ CART = rpart(train$point_security~.,
 rpart.plot(CART)
 
 
+# KNN model
+new_safety_data <- read.table(file="safety_data_clean.csv", header = TRUE, na.strings=c("", "NA"), sep=",")
 
+for(i in names(new_safety_data)){
+  new_safety_data[[i]] <- as.numeric(new_safety_data[[i]])
+}
 
+new_smp_size <- floor(0.7 * nrow(new_safety_data))
+## set the seed to make your partition reproductible
+set.seed(888)
+new_train_ind <- sample(seq_len(nrow(new_safety_data)), size = new_smp_size)
 
+new_train <- new_safety_data[new_train_ind, ]
+new_test <- new_safety_data[-new_train_ind, ]
 
+nn3 <- knn (new_train, new_test, new_train$point_security, k=3)
+table(nn3, new_test$point_security)
 
+# knn5 seems to be the best
+nn5 <- knn (new_train, new_test, new_train$point_security, k=5)
+table(nn5, new_test$point_security)
+
+nn7 <- knn (new_train, new_test, new_train$point_security, k=7)
+table(nn7, new_test$point_security)
+
+nn9 <- knn (new_train, new_test, new_train$point_security, k=9)
+table(nn9, new_test$point_security)
+
+nn11 <- knn (new_train, new_test, new_train$point_security, k=11)
+table(nn11, new_test$point_security)
