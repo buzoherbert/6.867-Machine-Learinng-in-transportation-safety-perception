@@ -1,21 +1,21 @@
 
-install.packages("GGally", dependencies = TRUE);
-install.packages("ggplot2", dependencies = TRUE);
-install.packages("caTools", dependencies = TRUE);
+install.packages("GGally", dependencies = TRUE)
+install.packages("ggplot2", dependencies = TRUE)
+install.packages("caTools", dependencies = TRUE)
 install.packages("magrittr")
 install.packages("class")
 
 
 # Graphing library
- library(GGally);
- library(ggplot2);
+ library(GGally)
+ library(ggplot2)
 
 
 # For sample splitting
-library("caTools");
+library("caTools")
 
 # For removing unused levels in test data
-library(magrittr);
+library(magrittr)
 
 # For knn model
 library("class");
@@ -27,19 +27,19 @@ plot_data <- read.table(file="safety_data_clean.csv", header = TRUE, na.strings=
 for(i in names(plot_data)){
   if(i == "total_female_count"){
     print(i)
-    plot_data[["total_female_count"]] = as.numeric(as.character(plot_data[["total_female_count"]]));
+    plot_data[["total_female_count"]] = as.numeric(as.character(plot_data[["total_female_count"]]))
   } else if(i == "total_passenger_count"){
     print(i)
-    plot_data[["total_passenger_count"]] = as.numeric(as.character(plot_data[["total_passenger_count"]]));
+    plot_data[["total_passenger_count"]] = as.numeric(as.character(plot_data[["total_passenger_count"]]))
   } else if(i == "empty_seats") {
     print(i)
-    plot_data[["empty_seats"]] = as.numeric(as.character(plot_data[["empty_seats"]]));
+    plot_data[["empty_seats"]] = as.numeric(as.character(plot_data[["empty_seats"]]))
   } else if(i == "point_security") {
     print(i)
-    plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]));
+    plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
   } else if(i == "haversine") {
     print(i)
-    plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]]);      
+    plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]])      
   } else {
     print("default")
     plot_data[[i]] <- as.factor(plot_data[[i]])
@@ -48,18 +48,18 @@ for(i in names(plot_data)){
 
 # Some fields have to be treated as numeric.
 # TODO improve this so we don't convert the data twice.
-plot_data[["total_female_count"]] = as.numeric(as.character(plot_data[["total_female_count"]]));
-plot_data[["total_passenger_count"]] = as.numeric(as.character(plot_data[["total_passenger_count"]]));
-plot_data[["empty_seats"]] = as.numeric(as.character(plot_data[["empty_seats"]]));
-plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]));
-plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]]);
+plot_data[["total_female_count"]] = as.numeric(as.character(plot_data[["total_female_count"]]))
+plot_data[["total_passenger_count"]] = as.numeric(as.character(plot_data[["total_passenger_count"]]))
+plot_data[["empty_seats"]] = as.numeric(as.character(plot_data[["empty_seats"]]))
+plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
+plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]])
 
 
 # Getting a summary of the data
 # summary(plot_data)
 
 # plotting the data
-#to_plot = plot_data;
+#to_plot = plot_data
 #to_plot$point_security = as.factor(to_plot$point_security)
 #ggpairs(to_plot, mapping = aes(color = point_security))
 
@@ -330,38 +330,38 @@ summary(linear_model)
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
 getModelMetrics <- function(model_name, linear_model, summaries_table, train_data, test_data) {
-  test_data = na.omit(remove_missing_levels (fit=linear_model, test_data=test_data));
+  test_data = na.omit(remove_missing_levels (fit=linear_model, test_data=test_data))
   
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
-    summaries_table <- data.frame(matrix(ncol = 9, nrow = 0));
-    names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num");
-    colnames(summaries_table) <- names;
+    summaries_table <- data.frame(matrix(ncol = 9, nrow = 0))
+    names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num")
+    colnames(summaries_table) <- names
   }
   
-  pred_data = predict(linear_model, newdata = test_data);
-  SSE = sum((pred_data - test_data$point_security)^2);
-  pred_mean = mean(train_data$point_security);
-  SST = sum((pred_mean - test_data$point_security)^2);
-  OSR2 = 1-SSE/SST;
-  RMSE = sqrt(sum((pred_data - test_data$point_security)^2)/nrow(test_data));
-  MAE = sum(abs(pred_data - test_data$point_security))/nrow(test_data);
+  pred_data = predict(linear_model, newdata = test_data)
+  SSE = sum((pred_data - test_data$point_security)^2)
+  pred_mean = mean(train_data$point_security)
+  SST = sum((pred_mean - test_data$point_security)^2)
+  OSR2 = 1-SSE/SST
+  RMSE = sqrt(sum((pred_data - test_data$point_security)^2)/nrow(test_data))
+  MAE = sum(abs(pred_data - test_data$point_security))/nrow(test_data)
   
-  i = nrow(summaries_table) + 1;
-  summaries_table[i, "model"] = model_name;
-  summaries_table[i, "r2"] = summary(linear_model)$r.squared;
-  summaries_table[i, "sse"] = SSE;
-  summaries_table[i, "pred_means"] = pred_mean;
-  summaries_table[i, "sst"] = SST;
-  summaries_table[i, "osr2"] = OSR2;
-  summaries_table[i, "rmse"] = RMSE;
-  summaries_table[i, "mae"] = MAE;
-  summaries_table[i,"var_num"] = length(names(linear_model$coefficients));
+  i = nrow(summaries_table) + 1
+  summaries_table[i, "model"] = model_name
+  summaries_table[i, "r2"] = summary(linear_model)$r.squared
+  summaries_table[i, "sse"] = SSE
+  summaries_table[i, "pred_means"] = pred_mean
+  summaries_table[i, "sst"] = SST
+  summaries_table[i, "osr2"] = OSR2
+  summaries_table[i, "rmse"] = RMSE
+  summaries_table[i, "mae"] = MAE
+  summaries_table[i,"var_num"] = length(names(linear_model$coefficients))
   
-  return(summaries_table);
+  return(summaries_table)
 }
 
-summaries = getModelMetrics("Initial model",linear_model, summaries, train, test);
+summaries = getModelMetrics("Initial model",linear_model, summaries, train, test)
 
 # Taking out the least relevant variables
 linear_model2 = lm(train$point_security~. 
@@ -370,8 +370,8 @@ linear_model2 = lm(train$point_security~.
                    -total_passenger_count -total_female_count -empty_seats
                    -base_study_zone -total_seats -haversine
                    -hour, data = train)
-summary(linear_model2);
-summaries = getModelMetrics("Relevant variables",linear_model2, summaries, train, test);
+summary(linear_model2)
+summaries = getModelMetrics("Relevant variables",linear_model2, summaries, train, test)
 
 
 #Call:
@@ -491,7 +491,7 @@ summaries = getModelMetrics("Relevant variables",linear_model2, summaries, train
 
 linear_model3 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
 summary(linear_model3)
-summaries = getModelMetrics("Trip variables",linear_model3, summaries, train, test);
+summaries = getModelMetrics("Trip variables",linear_model3, summaries, train, test)
 
 
 #Call:
@@ -588,7 +588,7 @@ summaries = getModelMetrics("Trip variables",linear_model3, summaries, train, te
 
 linear_model4 = lm(train$point_security~ +mode_security +importance_safety +most_safe +least_safe, data = train)
 summary(linear_model4)
-summaries = getModelMetrics("Perception variables",linear_model4, summaries, train, test);
+summaries = getModelMetrics("Perception variables",linear_model4, summaries, train, test)
 
 # Call:
 # lm(formula = train$point_security ~ +mode_security + importance_safety + 
@@ -630,8 +630,8 @@ summaries = getModelMetrics("Perception variables",linear_model4, summaries, tra
 #Only  instant contextual information
 linear_model5 = lm(train$point_security~ +haversine +urban_typology +total_passenger_count
                    +total_female_count +empty_seats +hour +week_day, data = train)
-summary(linear_model5);
-summaries = getModelMetrics("Instant contextual information",linear_model5, summaries, train, test);
+summary(linear_model5)
+summaries = getModelMetrics("Instant contextual information",linear_model5, summaries, train, test)
 
 # Call:
 # lm(formula = train$point_security ~ +haversine + urban_typology + 
@@ -683,7 +683,7 @@ summaries = getModelMetrics("Instant contextual information",linear_model5, summ
 # Only sociodemographic data
 linear_model6 = lm(train$point_security~ +age +gender +education, data = train)
 summary(linear_model6)
-summaries = getModelMetrics("Sociodemographic data",linear_model6, summaries, train, test);
+summaries = getModelMetrics("Sociodemographic data",linear_model6, summaries, train, test)
 
 # Call:
 # lm(formula = train$point_security ~ +age + gender + education, 
@@ -718,7 +718,7 @@ summaries = getModelMetrics("Sociodemographic data",linear_model6, summaries, tr
 # Only personal trip information
 linear_model7 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
 summary(linear_model7)
-summaries = getModelMetrics("Personal trip information",linear_model7, summaries, train, test);
+summaries = getModelMetrics("Personal trip information",linear_model7, summaries, train, test)
 
 # Call:
 # lm(formula = train$point_security ~ +origin + destination + companions + 
