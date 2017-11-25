@@ -19,7 +19,7 @@ library("caTools");
 library(magrittr);
 
 # For knn model
-library("class")
+library("class");
 
 # loading file
 safety_data <- read.table(file="safety_data.csv", header = TRUE, na.strings=c("", "NA"), sep=",")
@@ -903,16 +903,21 @@ new_test <- new_safety_data[-new_train_ind, ]
 
 nn3 <- knn (new_train, new_test, new_train$point_security, k=3)
 table(nn3, new_test$point_security)
+prop.table(table(nn3, new_test$point_security))
 
-# knn5 seems to be the best
 nn5 <- knn (new_train, new_test, new_train$point_security, k=5)
 table(nn5, new_test$point_security)
+prop.table(table(nn5, new_test$point_security))
 
+# seems to be best
 nn7 <- knn (new_train, new_test, new_train$point_security, k=7)
 table(nn7, new_test$point_security)
+prop.table(table(nn7, new_test$point_security))
 
 nn9 <- knn (new_train, new_test, new_train$point_security, k=9)
 table(nn9, new_test$point_security)
+prop.table(table(nn9, new_test$point_security))
 
 nn11 <- knn (new_train, new_test, new_train$point_security, k=11)
 table(nn11, new_test$point_security)
+prop.table(table(nn11, new_test$point_security))
