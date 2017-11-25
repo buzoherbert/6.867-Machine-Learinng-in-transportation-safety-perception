@@ -7,8 +7,8 @@ install.packages("class")
 
 
 # Graphing library
- library(GGally)
- library(ggplot2)
+library(GGally)
+library(ggplot2)
 
 
 # For sample splitting
@@ -73,6 +73,12 @@ train_ind <- sample(seq_len(nrow(plot_data)), size = smp_size)
 
 train <- plot_data[train_ind, ]
 test <- plot_data[-train_ind, ]
+
+train = subset(train, select = -c(X))
+test = subset(test, select = -c(X))
+
+
+
 # Removing categories not on the training set
 # Residual standard error: 1.092 on 550 degrees of freedom
 # Multiple R-squared:  0.416,	Adjusted R-squared:  0.2727 
@@ -361,7 +367,7 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   return(summaries_table)
 }
 
-summaries = getModelMetrics("Initial model",linear_model, summaries, train, test)
+summaries = getModelMetrics("Initial model",linear_model, NULL, train, test)
 
 # Taking out the least relevant variables
 linear_model2 = lm(train$point_security~. 
