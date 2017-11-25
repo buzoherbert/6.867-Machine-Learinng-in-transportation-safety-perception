@@ -98,3 +98,6 @@ clean_data[["haversine"]] = as.numeric(clean_data[["haversine"]])
 
 #Removing incomplete cases
 clean_data = na.omit(clean_data)
+
+#Writing to a file
+write.csv(dataset, "safety_data_clean.csv")
