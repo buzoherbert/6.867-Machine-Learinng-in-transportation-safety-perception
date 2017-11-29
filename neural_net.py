@@ -1,182 +1,56 @@
 #Python 3 file
 
-from random import shuffle
+from random import shuffle, randrange
 import csv
 import numpy as np
-#from nn import NeuralNet
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Activation #Dropout, Flatten
-#from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Dense, Activation, Dropout, PReLU, LeakyReLU #, Flatten
 from keras.optimizers import SGD
 from keras import initializers
 from sklearn import preprocessing
 import math
 import matplotlib.pyplot as plt
+from process_data import Data
+from sklearn.metrics import f1_score
 
-#np.random.seed(0)
 TEST_RATIO = 0.0 #float from 0.0 to 1.0
-VAL_RATIO = 0.2 #float from 0.0 to 1.0
+VAL_RATIO = 0.3 #float from 0.0 to 1.0
 NORMALIZE = True #normalize data in "total_passenger_count", "total_female_count", "empty_seats", "haversine"
 BATCH_SIZE = 5
+INCLUDE = "ALL" #one of "trip_var", "perception_var", "contextual_var", "sociodemographic_var", "ALL"
+ACTIVATION = "relu"
 
-print('======Training======')
-# load data from csv files
-def trim_quote(s):
-    if s[0] == '"':
-        s = s[1:-1]
-    return s
+#set COMPARE to true if you want to compare our model with a "mode model" (predict everything to be the most probable perception value)
+# and a "random model" (predict perception value x with probability weighted according to the distribution of perception x occuring)
+COMPARE = False
 
-titles = []
-data = []
+data_loader = Data(VAL_RATIO, TEST_RATIO, INCLUDE, normalize = NORMALIZE)
 
-with open('safety_data_clean.csv') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='\\')
-    row_no = 1
-    for row in reader:
-        if row_no == 1:
-            row_no += 1
-            titles = [trim_quote(s) for s in row[1:]] #ignore first column
-            continue
-        if row[11] == '"I"': #ignore the weird row with I as importance
-            continue
-        data_row = {}
-        for i in range(len(row)-1): #ignore first column
-            data_row[titles[i]] = trim_quote(row[i+1])
-        data.append(data_row)
-
-#if one of "total_passenger_count", "total_female_count", or "empty_seats" is negative, set them all to 0
-for point in data:
-    x = min(int(point["total_passenger_count"]), int(point["total_female_count"]), int(point["empty_seats"]))
-    if x < 0:
-        point["total_passenger_count"] = 0
-        point["total_female_count"] = 0
-        point["empty_seats"] = 0
-
-
-#split train val test
-shuffle(data)
-n = len(data)
-test_no = int(n*TEST_RATIO)
-val_no = int(n*VAL_RATIO)
-train = data[:n-test_no-val_no]
-val = data[n-test_no-val_no:n-test_no]
-test = data[n-test_no:]
-
-
-# process all categories
-def get_vector(train, val, test):
-    le = preprocessing.LabelEncoder()
-    train_classes = le.fit_transform(train)
-    num_classes = len(le.classes_)
-    val_classes = [le.transform([s])[0] if s in le.classes_ else num_classes for s in val] #create new "other" category for unseen
-    test_classes = [le.transform([s])[0] if s in le.classes_ else num_classes for s in test]
-
-    vector = keras.utils.to_categorical(np.concatenate([train_classes, np.array(val_classes + test_classes)]))
-    vector_trim = vector[:,:num_classes] #trim away "other" category
-
-    return le.classes_, vector_trim[:len(train)], vector_trim[len(train):len(train)+len(val)], vector_trim[len(train)+len(val):]
-
-ptitles = []
-train_plist = []
-val_plist = []
-test_plist = []
-
-title_y = None
-train_y = None
-val_y = None
-test_y = None
-
-for title in titles:
-    train_raw = [s[title] for s in train]
-    val_raw = [s[title] for s in val]
-    test_raw = [s[title] for s in test]
-    """
-    if title == "age":
-        cat_to_no = {"0-17": 9, "18-24": 21, "25-44": 35, "45-64": 55, "65+": 65}
-        ptitles.append(title)
-        train_plist.append(np.array([cat_to_no[s] for s in train_raw]).reshape((-1, 1)))
-        val_plist.append(np.array([cat_to_no[s] for s in val_raw]).reshape((-1, 1)))
-        test_plist.append(np.array([cat_to_no[s] for s in test_raw]).reshape((-1, 1)))
-    """
-    if title == "mode_security" or title == "importance_safety":
-        ptitles.append(np.array([title]))
-        train_plist.append(np.array([0.2*int(s) for s in train_raw]).reshape((-1, 1))) #0.2 factor to normalize
-        val_plist.append(np.array([0.2*int(s) for s in val_raw]).reshape((-1, 1)))
-        test_plist.append(np.array([0.2*int(s) for s in test_raw]).reshape((-1, 1)))
-    elif title == "point_security":
-        title_y = np.array([title])
-        train_y = np.array([int(s)-1 for s in train_raw]).reshape((-1, 1)) #convert from 1-5 to 0-4
-        val_y = np.array([int(s)-1 for s in val_raw]).reshape((-1, 1))
-        test_y = np.array([int(s)-1 for s in test_raw]).reshape((-1, 1))
-    elif title == "total_passenger_count" or title == "total_female_count" or title == "empty_seats" or title == "haversine":
-        ptitles.append(np.array([title]))
-        vec_train = np.array([int(s) for s in train_raw]).reshape((-1, 1))
-        vec_val = np.array([int(s) for s in val_raw]).reshape((-1, 1))
-        vec_test = np.array([int(s) for s in test_raw]).reshape((-1, 1))
-        if NORMALIZE:
-            vec_train = vec_train/np.max(vec_train)
-            vec_val = vec_val/np.max(vec_val)
-            vec_test = vec_test/np.max(vec_test) if len(vec_test) > 0 else vec_test
-            
-        train_plist.append(vec_train)
-        val_plist.append(vec_val)
-        test_plist.append(vec_test)
-    elif title == "hour":
-        train_sin = [math.sin(2*math.pi*int(s)/24.0) for s in train_raw]
-        train_cos = [math.cos(2*math.pi*int(s)/24.0) for s in train_raw]
-        val_sin = [math.sin(2*math.pi*int(s)/24.0) for s in val_raw]
-        val_cos = [math.cos(2*math.pi*int(s)/24.0) for s in val_raw]
-        test_sin = [math.sin(2*math.pi*int(s)/24.0) for s in test_raw]
-        test_cos = [math.cos(2*math.pi*int(s)/24.0) for s in test_raw]
-        
-        ptitles.append(np.array(["hour_sin", "hour_cos"]))
-        train_plist.append(np.array([train_sin, train_cos]).transpose())
-        val_plist.append(np.array([val_sin, val_cos]).transpose())
-        test_plist.append(np.array([test_sin, test_cos]).transpose())
-    else:
-        classes, vec_train, vec_val, vec_test = get_vector(train_raw, val_raw, test_raw)
-        prefixed = [title + '.' + s for s in classes.tolist()]
-        ptitles.append(np.array(prefixed))
-        train_plist.append(vec_train)
-        val_plist.append(vec_val)
-        test_plist.append(vec_test)
-
-final_titles = np.concatenate(ptitles)
-final_train = np.concatenate(train_plist, axis=1)
-final_val = np.concatenate(val_plist, axis=1)
-final_test = np.concatenate(test_plist, axis=1)
+title_x, title_y = data_loader.get_title()
+train_x, train_y = data_loader.get_train_data()
+val_x, val_y = data_loader.get_val_data()
+test_x, test_y = data_loader.get_test_data()
 
 trainclass_y = keras.utils.to_categorical(train_y)
-valclass_y = []
-testclass_y = []
-"""
-with open('safety_data_vectorized_train.csv', 'w') as csvfile:
-    writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    writer.writerow(np.concatenate((final_titles, title_y)))
-    for i in range(train_y.size):
-        writer.writerow(np.concatenate((final_train[i], train_y[i])))
 
-with open('safety_data_vectorized_val.csv', 'w') as csvfile:
-    writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    writer.writerow(np.concatenate((final_titles, title_y)))
-    for i in range(val_y.size):
-        writer.writerow(np.concatenate((final_val[i], val_y[i])))
-"""
-#Y_train_class = keras.utils.to_categorical(Y_modified, num_classes=2)
 
-M1 = 12
-M2 = 10
-input_dim = len(final_titles)
+M1 = 10
+M2 = 10 #Set None to remove second layer
+Dropout_rate = 0.0 # set 0.0 to disable dropout
+input_dim = len(title_x)
 
 model = Sequential()
-model.add(Dense(M1, activation='relu', input_dim=input_dim))
+model.add(Dense(M1, activation=ACTIVATION, input_dim=input_dim))
+if Dropout_rate > 0:
+    model.add(Dropout(Dropout_rate))
 if M2 != None:
-    model.add(Dense(M2, activation='relu'))
+    model.add(Dense(M2, activation=ACTIVATION))
+    if Dropout_rate > 0:
+        model.add(Dropout(Dropout_rate))
 model.add(Dense(5))
 model.add(Activation('softmax'))
 
-#sgd = SGD(lr=0.01)
 model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
 
 """
@@ -195,38 +69,94 @@ def get_error_rate(Y_true, Y_pred):
             err += 1
     return float(err)/n
 
+def sse(Y_true, Y_pred):
+    n = Y_true.size
+    total = 0
+    for i in range(n):
+        total += (Y_true[i][0] - Y_pred[i])**2
+    return total
+
 train_rates = []
 val_rates = []
 test_rates = []
 
+train_f1 = []
+val_f1 = []
+test_f1 = []
+
 for i in range(50):
-    model.fit(final_train, trainclass_y, epochs=1, batch_size=BATCH_SIZE)
-    predict_train = model.predict_classes(final_train, verbose=0)
+    model.fit(train_x, trainclass_y, epochs=1, batch_size=BATCH_SIZE)
+    predict_train = model.predict_classes(train_x, verbose=0)
     train_rates.append(get_error_rate(train_y, predict_train))
-    predict_val = model.predict_classes(final_val, verbose=0)
+    train_f1.append(f1_score(train_y, predict_train, average='weighted'))
+    predict_val = model.predict_classes(val_x, verbose=0)
     val_rates.append(get_error_rate(val_y, predict_val))
+    val_f1.append(f1_score(val_y, predict_val, average='weighted'))
     if len(test_y) > 0:
-        predict_test = model.predict_classes(final_test, verbose=0)
+        predict_test = model.predict_classes(test_x, verbose=0)
         test_rates.append(get_error_rate(test_y, predict_test))
+        test_f1.append(f1_score(test_y, predict_test, average='weighted'))
 
-train_confusion = np.zeros((5, 5))
-val_confusion = np.zeros((5, 5))
-test_confusion = np.zeros((5, 5))
-for i in range(len(train_y)):
-    train_confusion[train_y[i][0]][predict_train[i]] += 1
-for i in range(len(val_y)):
-    val_confusion[val_y[i][0]][predict_val[i]] += 1
-for i in range(len(test_y)):
-    test_confusion[test_y[i][0]][predict_test[i]] += 1
+def get_confusion_mtx(y_true, y_pred):
+    confusion = np.zeros((5, 5))
+    for i in range(len(y_true)):
+        confusion[y_true[i][0]][y_pred[i]] += 1
+    return confusion
+
+
+confusion_train = get_confusion_mtx(train_y, predict_train)
 print("Confusion matrix for training data:")
-print(train_confusion)
+print(confusion_train)
 
+confusion_val = get_confusion_mtx(val_y, predict_val)
 print("Confusion matrix for validation data:")
-print(val_confusion)
+print(confusion_val)
 
-print("Confusion matrix for test data:")
-print(test_confusion)
+if len(test_y) > 0:
+    confusion_test = get_confusion_mtx(test_y, predict_test)
+    print("Confusion matrix for test data:")
+    print(confusion_test)
 
+
+error = val_rates[-1]
+
+print("final error rate on val data: ", error)
+
+f1 = val_f1[-1]
+
+print("final weighted f1 rate on val data: ", f1)
+
+def weighted_random(weights):
+    x = randrange(sum(weights))
+    for i in range(len(weights)):
+        if x < weights[i]:
+            return i
+        else:
+            x = x - weights[i]
+
+if COMPARE:
+
+    sums = np.sum(trainclass_y, axis=0)
+    mode = max(range(5), key=lambda x: sums[x])
+    mode_prediction = np.array([mode for i in range(val_y.size)])
+    random_pred = np.array([weighted_random(sums) for i in range(val_y.size)])
+    error_mode = get_error_rate(val_y, mode_prediction)
+    error_random = get_error_rate(val_y, random_pred)
+
+    confusion_mode = get_confusion_mtx(val_y, mode_prediction)
+    confusion_rand = get_confusion_mtx(val_y, random_pred)
+
+    print("error rate using mode: ", error_mode)
+    print("f1 rate using mode: ", f1_score(val_y, mode_prediction, average='weighted'))
+
+    print("error rate using random: ", error_random)
+    print("f1 rate using random: ", f1_score(val_y, random_pred, average='weighted'))
+
+    print("Confusion matrix for mode:")
+    print(confusion_mode)
+
+    print("Confusion matrix for random:")
+    print(confusion_rand)
 
 plt.plot(train_rates, 'go-', label="train")
 plt.plot(val_rates, 'ro-', label="val")
@@ -235,3 +165,9 @@ plt.title("error rate vs epoch number")
 plt.legend()
 plt.show()
 
+plt.plot(train_f1, 'go-', label="train")
+plt.plot(val_f1, 'ro-', label="val")
+plt.plot(test_f1, 'bo-', label="test")
+plt.title("weighted f1 score vs epoch number")
+plt.legend()
+plt.show()
