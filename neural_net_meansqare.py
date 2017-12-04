@@ -12,6 +12,7 @@ from keras import losses
 import math
 import matplotlib.pyplot as plt
 from process_data import Data
+from sklearn.metrics import f1_score
 
 TEST_RATIO = 0.0 #float from 0.0 to 1.0
 VAL_RATIO = 0.3 #float from 0.0 to 1.0
@@ -95,6 +96,21 @@ print("sst for val data: ", sst)
 osr2 = 1.0 - sse_final/sst
 
 print("osr2: ", osr2)
+
+
+def get_confusion_mtx(y_true, y_pred):
+    confusion = np.zeros((5, 5))
+    for i in range(len(y_true)):
+        confusion[y_true[i][0]][y_pred[i]] += 1
+    return confusion
+
+predict_val_int = predict_val.round().astype(int)
+confusion_val = get_confusion_mtx(val_y, predict_val_int)
+print("Confusion matrix for validation data:")
+print(confusion_val)
+print(get_error_rate(val_y, predict_val_int))
+print(f1_score(val_y, predict_val_int, average='weighted'))
+
 
 plt.plot(train_rates, 'go-', label="train")
 plt.plot(val_rates, 'ro-', label="val")
