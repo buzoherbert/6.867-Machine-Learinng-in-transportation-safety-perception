@@ -9,12 +9,13 @@ import keras
 
 trip_var = ["origin", "destination", "companions", "trip_purpose"]
 perception_var = ["mode_security", "importance_safety", "most_safe", "least_safe"]
-contextual_var = ["haversine", "urban_typology", "total_passenger_count", "total_female_count",
-                        "empty_seats", "hour", "week_day"]
+instant_var = ["haversine", "urban_typology", "total_passenger_count", "total_female_count",
+                        "empty_seats", "hour_sin", "hour_cos", "week_day"]
+contextual_var = ["bus_or_ped", "base_study_zone", "busdestination", "total_seats"]
 sociodemographic_var = ["age", "gender", "education"]
 
 class Data:
-    def __init__(self, val_ratio, test_ratio, include, normalize = True):
+    def __init__(self, val_ratio, test_ratio, include, filename, normalize = True):
         self.test_ratio = test_ratio #float from 0.0 to 1.0
         self.val_ratio = val_ratio #float from 0.0 to 1.0
         self.normalize = normalize
@@ -22,6 +23,8 @@ class Data:
             self.include = trip_var
         elif include == "perception_var":
             self.include = perception_var
+        elif include == "instant_var":
+            self.include = instant_var
         elif include == "contextual_var":
             self.include = contextual_var
         elif include == "sociodemographic_var":
@@ -32,14 +35,14 @@ class Data:
             print("include parameter ill-defined")
             raise ValueError("include parameter ill-defined")
             
-        self.titles, self.data = self.get_raw_data()
+        self.titles, self.data = self.get_raw_data(filename)
         self.process_data(self.titles, self.data)
 
     # load data from csv files
-    def get_raw_data(self):
+    def get_raw_data(self, filename):
         titles = []
         data = []
-        with open('safety_data_clean.csv') as csvfile:
+        with open(filename) as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='\\')
             row_no = 1
             for row in reader:
@@ -47,26 +50,15 @@ class Data:
                     row_no += 1
                     titles = [trim_quote(s) for s in row[1:]] #ignore first column
                     continue
-                if row[11] == '"I"': #ignore the weird row with I as importance
-                    continue
                 data_row = {}
                 for i in range(len(row)-1): #ignore first column
                     data_row[titles[i]] = trim_quote(row[i+1])
                 data.append(data_row)
         
-        #if one of "total_passenger_count", "total_female_count", or "empty_seats" is negative, set them all to 0
-        for point in data:
-            x = min(int(point["total_passenger_count"]), int(point["total_female_count"]), int(point["empty_seats"]))
-            if x < 0:
-                point["total_passenger_count"] = 0
-                point["total_female_count"] = 0
-                point["empty_seats"] = 0
-        
         return titles, data
 
     def process_data(self, titles, data):
         #split train val test
-        shuffle(data)
         n = len(data)
         test_no = int(n*self.test_ratio)
         val_no = int(n*self.val_ratio)
@@ -79,13 +71,18 @@ class Data:
         val_plist = []
         test_plist = []
 
+        latlontitles = []
+        train_latlon = []
+        val_latlon = []
+        test_latlon = []
+
         title_y = None
         train_y = None
         val_y = None
         test_y = None
 
         for title in titles:
-            if self.include != None and title not in self.include + ["point_security"]:
+            if self.include != None and title not in self.include + ["point_security", "latitude", "longitude"]:
                 continue
             train_raw = [s[title] for s in train]
             val_raw = [s[title] for s in val]
@@ -108,7 +105,7 @@ class Data:
                 train_y = np.array([int(s)-1 for s in train_raw]).reshape((-1, 1)) #convert from 1-5 to 0-4
                 val_y = np.array([int(s)-1 for s in val_raw]).reshape((-1, 1))
                 test_y = np.array([int(s)-1 for s in test_raw]).reshape((-1, 1))
-            elif title == "total_passenger_count" or title == "total_female_count" or title == "empty_seats" or title == "haversine":
+            elif title == "total_passenger_count" or title == "total_female_count" or title == "empty_seats":
                 ptitles.append(np.array([title]))
                 vec_train = np.array([int(s) for s in train_raw]).reshape((-1, 1))
                 vec_val = np.array([int(s) for s in val_raw]).reshape((-1, 1))
@@ -121,18 +118,27 @@ class Data:
                 train_plist.append(vec_train)
                 val_plist.append(vec_val)
                 test_plist.append(vec_test)
-            elif title == "hour":
-                train_sin = [math.sin(2*math.pi*int(s)/24.0) for s in train_raw]
-                train_cos = [math.cos(2*math.pi*int(s)/24.0) for s in train_raw]
-                val_sin = [math.sin(2*math.pi*int(s)/24.0) for s in val_raw]
-                val_cos = [math.cos(2*math.pi*int(s)/24.0) for s in val_raw]
-                test_sin = [math.sin(2*math.pi*int(s)/24.0) for s in test_raw]
-                test_cos = [math.cos(2*math.pi*int(s)/24.0) for s in test_raw]
-                
-                ptitles.append(np.array(["hour_sin", "hour_cos"]))
-                train_plist.append(np.array([train_sin, train_cos]).transpose())
-                val_plist.append(np.array([val_sin, val_cos]).transpose())
-                test_plist.append(np.array([test_sin, test_cos]).transpose())
+            elif title == "hour_sin" or title == "hour_cos" or title == "haversine":
+                ptitles.append(np.array([title]))
+                vec_train = np.array([float(s) for s in train_raw]).reshape((-1, 1))
+                vec_val = np.array([float(s) for s in val_raw]).reshape((-1, 1))
+                vec_test = np.array([float(s) for s in test_raw]).reshape((-1, 1))
+                if self.normalize and title == "haversine":
+                    vec_train = vec_train/np.max(vec_train)
+                    vec_val = vec_val/np.max(vec_val)
+                    vec_test = vec_test/np.max(vec_test) if len(vec_test) > 0 else vec_test
+                    
+                train_plist.append(vec_train)
+                val_plist.append(vec_val)
+                test_plist.append(vec_test)
+            elif title == "latitude" or title == "longitude":
+                latlontitles.append(np.array([title]))
+                vec_train = np.array([float(s) for s in train_raw]).reshape((-1, 1))
+                vec_val = np.array([float(s) for s in val_raw]).reshape((-1, 1))
+                vec_test = np.array([float(s) for s in test_raw]).reshape((-1, 1))
+                train_latlon.append(vec_train)
+                val_latlon.append(vec_val)
+                test_latlon.append(vec_test)
             else:
                 classes, vec_train, vec_val, vec_test = get_vector(train_raw, val_raw, test_raw)
                 prefixed = [title + '.' + s for s in classes.tolist()]
@@ -141,10 +147,10 @@ class Data:
                 val_plist.append(vec_val)
                 test_plist.append(vec_test)
 
-        self.final_titles = np.concatenate(ptitles)
-        self.final_train = np.concatenate(train_plist, axis=1)
-        self.final_val = np.concatenate(val_plist, axis=1)
-        self.final_test = np.concatenate(test_plist, axis=1)
+        self.final_titles = np.concatenate(ptitles + latlontitles)
+        self.final_train = np.concatenate(train_plist + train_latlon, axis=1)
+        self.final_val = np.concatenate(val_plist + val_latlon, axis=1)
+        self.final_test = np.concatenate(test_plist + test_latlon, axis=1)
 
         self.title_y = title_y
         self.train_y = train_y

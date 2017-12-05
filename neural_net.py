@@ -20,17 +20,23 @@ NORMALIZE = True #normalize data in "total_passenger_count", "total_female_count
 BATCH_SIZE = 5
 INCLUDE = "ALL" #one of "trip_var", "perception_var", "contextual_var", "sociodemographic_var", "ALL"
 ACTIVATION = "relu"
+FILENAME = 'final_data_0.csv'
 
 #set COMPARE to true if you want to compare our model with a "mode model" (predict everything to be the most probable perception value)
 # and a "random model" (predict perception value x with probability weighted according to the distribution of perception x occuring)
 COMPARE = False
 
-data_loader = Data(VAL_RATIO, TEST_RATIO, INCLUDE, normalize = NORMALIZE)
+data_loader = Data(VAL_RATIO, TEST_RATIO, INCLUDE, FILENAME, normalize = NORMALIZE)
 
 title_x, title_y = data_loader.get_title()
 train_x, train_y = data_loader.get_train_data()
 val_x, val_y = data_loader.get_val_data()
 test_x, test_y = data_loader.get_test_data()
+
+if INCLUDE == "ALL":
+    train_x = train_x[:,:-2] # remove lat and lon
+    val_x = val_x[:,:-2] # remove lat and lon
+
 
 trainclass_y = keras.utils.to_categorical(train_y)
 
@@ -38,7 +44,7 @@ trainclass_y = keras.utils.to_categorical(train_y)
 M1 = 10
 M2 = 10 #Set None to remove second layer
 Dropout_rate = 0.0 # set 0.0 to disable dropout
-input_dim = len(title_x)
+input_dim = train_x.shape[1]
 
 model = Sequential()
 model.add(Dense(M1, activation=ACTIVATION, input_dim=input_dim))
