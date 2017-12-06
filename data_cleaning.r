@@ -80,7 +80,11 @@ clean_data <- data.frame(
   total_female_count = safety_data[["totalfemalecount"]],
   empty_seats = safety_data[["emptyseats"]],
   hour = safety_data[["hour"]],
-  week_day = safety_data[["wday"]]
+  week_day = safety_data[["wday"]],
+  
+  # Exact positional information
+  latitude = safety_data[["latitude"]],
+  longitude = safety_data[["longitude"]]
 )
 
 # Treating all the variables as categorical
@@ -94,10 +98,12 @@ clean_data[["total_female_count"]] = as.numeric(as.character(clean_data[["total_
 clean_data[["total_passenger_count"]] = as.numeric(as.character(clean_data[["total_passenger_count"]]))
 clean_data[["empty_seats"]] = as.numeric(as.character(clean_data[["empty_seats"]]))
 clean_data[["point_security"]] = as.numeric(as.character(clean_data[["point_security"]]))
-clean_data[["haversine"]] = as.numeric(clean_data[["haversine"]])
+clean_data[["haversine"]] = as.numeric(as.character(clean_data[["haversine"]]))
+clean_data[["latitude"]] = as.numeric(as.character(clean_data[["latitude"]]))
+clean_data[["longitude"]] = as.numeric(as.character(clean_data[["longitude"]]))
 
 #Removing incomplete cases
 clean_data = na.omit(clean_data)
 
 #Writing to a file
-write.csv(dataset, "safety_data_clean.csv")
+write.csv(clean_data, "safety_data_clean_latlon.csv")
