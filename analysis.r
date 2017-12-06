@@ -81,7 +81,7 @@ test = subset(test, select = -c(X))
 
 # Removing categories not on the training set
 # Residual standard error: 1.092 on 550 degrees of freedom
-# Multiple R-squared:  0.416,	Adjusted R-squared:  0.2727 
+# Multiple R-squared:  0.416, Adjusted R-squared:  0.2727 
 # F-statistic: 2.902 on 135 and 550 DF,  p-value: < 2.2e-16
 
 # Funtion to remove misssing levels from fields in a testing dataframe
@@ -171,167 +171,6 @@ remove_missing_levels <- function(fit, test_data) {
   return(test_data)
 }
 
-
-########################
-## Linear regression model
-
-
-linear_model = lm(train$point_security~., data = train)
-summary(linear_model)
-
-#Call:
-  # lm(formula = train$point_security ~ ., data = train)
-  
-  # Residuals:
-#     Min      1Q  Median      3Q     Max 
-# -3.3654 -0.7034  0.0000  0.6053  2.9270 
-  
-# Coefficients: (5 not defined because of singularities)
-#                                     Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                        2.806e+00  1.760e+00   1.594  0.11147    
-# bus_or_pedVan                      3.207e-02  1.963e-01   0.163  0.87027    
-# inside_or_outsideFuera CETRAM     -1.010e-01  1.249e-01  -0.809  0.41913    
-# gendermale                        -6.937e-03  9.816e-02  -0.071  0.94368    
-# age0-17                            1.127e+00  7.030e-01   1.603  0.10948    
-# age18-24                           9.922e-01  6.855e-01   1.447  0.14834    
-# age25-44                           1.129e+00  6.870e-01   1.643  0.10100    
-# age45-64                           8.774e-01  6.936e-01   1.265  0.20642    
-# age65+                             9.814e-01  7.135e-01   1.375  0.16954    
-# educationLicenciatura             -7.413e-01  7.196e-01  -1.030  0.30340    
-# educationMaestria y Doctorado     -1.044e+00  8.311e-01  -1.256  0.20973    
-# educationPreparatoria             -5.926e-01  7.150e-01  -0.829  0.40759    
-# educationPrimaria                 -7.363e-01  7.375e-01  -0.998  0.31854    
-# educationSecundaria               -5.953e-01  7.143e-01  -0.833  0.40503    
-# educationSin estudios             -9.708e-01  8.422e-01  -1.153  0.24952    
-# originAcolman                     -1.351e+00  1.441e+00  -0.938  0.34884    
-# originAlvaro Obregon              -1.763e+00  9.084e-01  -1.941  0.05278 .  
-# originAtenco                      -1.099e+00  1.431e+00  -0.768  0.44275    
-# originAtizapan de Zaragoza        -2.355e+00  8.420e-01  -2.797  0.00535 ** 
-# originAzcapotzalco                -1.954e+00  8.424e-01  -2.320  0.02073 *  
-# originBenito Juarez               -1.565e+00  9.237e-01  -1.694  0.09084 .  
-# originChimalhuacï¿½ï¿½n     -1.208e+00  1.524e+00  -0.793  0.42828    
-# originCoacalco de Berriozal       -1.892e+00  9.231e-01  -2.050  0.04083 *  
-# originCoyoacan                    -2.394e+00  1.148e+00  -2.085  0.03749 *  
-# originCuajimalpa de Morelos       -1.887e+00  1.412e+00  -1.336  0.18200    
-# originCuauhtemoc                  -2.118e+00  8.948e-01  -2.367  0.01828 *  
-# originCuauhtlmoc                  -1.110e+00  1.460e+00  -0.760  0.44730    
-# originCuautitlan                  -1.908e+00  1.400e+00  -1.362  0.17361    
-# originCuautitlan Izcalli          -1.179e+00  1.207e+00  -0.977  0.32910    
-# originEcatepec de Morelos         -2.097e+00  8.641e-01  -2.427  0.01553 *  
-# originGustavo A. Madero           -1.742e+00  9.045e-01  -1.926  0.05461 .  
-# originIxtapaluca                  -1.692e+00  1.414e+00  -1.197  0.23178    
-# originIztacalco                   -2.955e+00  1.198e+00  -2.467  0.01393 *  
-# originIztapalapa                  -1.009e+00  1.069e+00  -0.944  0.34558    
-# originMagdalena Contreras         -3.244e-01  1.430e+00  -0.227  0.82068    
-# originMiguel Hidalgo              -1.939e+00  9.371e-01  -2.069  0.03903 *  
-# originNaucalpan de Juarez         -2.003e+00  9.383e-01  -2.135  0.03322 *  
-# originNextlalplan                 -2.604e+00  1.436e+00  -1.814  0.07030 .  
-# originNezahualcoyotl              -1.617e+00  1.583e+00  -1.021  0.30763    
-# originNicolas Romero              -2.295e+00  8.825e-01  -2.601  0.00955 ** 
-# originOtro                        -1.827e+00  9.441e-01  -1.935  0.05348 .  
-# originTecamec                     -1.747e+00  8.797e-01  -1.986  0.04749 *  
-# originTexcoco                     -2.296e+00  1.160e+00  -1.980  0.04822 *  
-# originTiahuac                     -1.633e+00  1.358e+00  -1.202  0.22974    
-# originTlalnepantla de Baz         -1.981e+00  8.456e-01  -2.342  0.01951 *  
-# originTlalpan                     -1.558e+00  1.162e+00  -1.341  0.18040    
-# originTultitlan                   -1.668e+00  9.642e-01  -1.730  0.08412 .  
-# originVenustiano Carranza         -2.201e+00  1.171e+00  -1.880  0.06062 .  
-# originZumpango                    -1.709e+00  1.511e+00  -1.131  0.25867    
-# destinationAlvaro Obregon          8.198e-01  1.371e+00   0.598  0.55022    
-# destinationAtenco                 -1.848e+00  2.339e+00  -0.790  0.42978    
-# destinationAtizapan de Zaragoza    1.523e+00  1.082e+00   1.408  0.15973    
-# destinationAzcapotzalco            1.680e+00  1.076e+00   1.561  0.11917    
-# destinationBenito Juarez           1.210e+00  1.217e+00   0.994  0.32051    
-# destinationChimalhuacan            9.233e-01  1.754e+00   0.526  0.59886    
-# destinationCoacalco de Berriozal   1.402e+00  1.133e+00   1.237  0.21665    
-# destinationCoyoacan                1.501e+00  1.358e+00   1.105  0.26957    
-# destinationCuajimalpa de Morelos   2.972e+00  1.233e+00   2.410  0.01630 *  
-# destinationCuauhtemoc              1.284e+00  1.161e+00   1.106  0.26920    
-# destinationCuautitlan              5.476e-01  1.370e+00   0.400  0.68946    
-# destinationCuautitlan Izcalli      9.045e-01  1.562e+00   0.579  0.56268    
-# destinationEcatepec de Morelos     1.235e+00  1.092e+00   1.131  0.25859    
-# destinationGustavo A. Madero       8.477e-01  1.182e+00   0.717  0.47349    
-# destinationIztacalco               8.463e-01  1.616e+00   0.524  0.60073    
-# destinationIztapalapa              2.159e+00  1.566e+00   1.379  0.16861    
-# destinationMiguel Hidalgo          1.992e+00  1.174e+00   1.696  0.09041 .  
-# destinationNaucalpan de Juarez     1.501e+00  1.100e+00   1.364  0.17307    
-# destinationNezahualcoyotl          7.135e-01  1.210e+00   0.589  0.55582    
-# destinationNicolas Romero          9.871e-01  1.117e+00   0.884  0.37718    
-# destinationOtro                    1.444e+00  1.148e+00   1.257  0.20919    
-# destinationTecamec                 1.243e+00  1.096e+00   1.134  0.25733    
-# destinationTemamatla              -8.183e-01  1.497e+00  -0.547  0.58486    
-# destinationTeotihuacï¿½ï¿½n         NA         NA      NA       NA    
-# destinationTizayuca                2.379e+00  1.596e+00   1.491  0.13663    
-# destinationTlalnepantla de Baz     1.644e+00  1.092e+00   1.506  0.13273    
-# destinationTlalpan                 2.776e+00  1.356e+00   2.047  0.04113 *  
-# destinationTultitlan               1.873e+00  1.344e+00   1.394  0.16398    
-# destinationVenustiano Carranza     1.531e+00  1.257e+00   1.218  0.22367    
-# companions1 to 2                   2.232e-01  7.377e-01   0.303  0.76236    
-# companions3 to 4                   7.408e-02  7.619e-01   0.097  0.92258    
-# companionsMas                     -1.678e-01  8.517e-01  -0.197  0.84385    
-# companionsNone                     2.991e-01  7.332e-01   0.408  0.68342    
-# trip_purposeCompra                 7.626e-01  6.932e-01   1.100  0.27175    
-# trip_purposeEstudio                9.176e-01  7.030e-01   1.305  0.19237    
-# trip_purposeOtro                   8.046e-01  6.820e-01   1.180  0.23860    
-# trip_purposeRecreacion             6.999e-01  6.919e-01   1.012  0.31218    
-# trip_purposeTrabajo                5.863e-01  6.764e-01   0.867  0.38639    
-# mode_security2                     4.309e-01  1.667e-01   2.585  0.01001 *  
-# mode_security3                     8.843e-01  1.266e-01   6.983 8.39e-12 ***
-# mode_security4                     1.302e+00  1.501e-01   8.673  < 2e-16 ***
-# mode_security5                     1.313e+00  2.011e-01   6.530 1.50e-10 ***
-# importance_safety1                -1.515e+00  1.303e+00  -1.163  0.24525    
-# importance_safety2                -1.312e+00  1.426e+00  -0.920  0.35817    
-# importance_safety3                -1.184e+00  1.279e+00  -0.926  0.35475    
-# importance_safety4                -1.000e+00  1.270e+00  -0.788  0.43125    
-# importance_safety5                -1.143e+00  1.261e+00  -0.907  0.36498    
-# most_safeBRT                       3.825e-01  3.534e-01   1.082  0.27965    
-# most_safeMetro                     3.892e-01  3.443e-01   1.130  0.25878    
-# most_safePeseros                   7.382e-01  3.819e-01   1.933  0.05373 .  
-# most_safeTaxi                      5.574e-01  3.554e-01   1.568  0.11741    
-# most_safeTrolebus                  8.849e-01  3.835e-01   2.308  0.02140 *  
-# least_safeBRT                     -2.127e-01  4.501e-01  -0.473  0.63669    
-# least_safeMetro                    1.524e-02  4.303e-01   0.035  0.97176    
-# least_safePeseros                 -3.709e-02  3.891e-01  -0.095  0.92409    
-# least_safeTaxi                     1.786e-01  4.021e-01   0.444  0.65716    
-# least_safeTrolebus                -7.255e-02  4.548e-01  -0.160  0.87332    
-# base_study_zoneEl Rosario          4.091e-01  3.229e-01   1.267  0.20573    
-# busdestinationHeroes Tecamec       3.434e-01  1.855e-01   1.852  0.06462 .  
-# busdestinationMexico Nueva        -1.476e-02  1.712e-01  -0.086  0.93133    
-# busdestinationMexipuerto                  NA         NA      NA       NA    
-# busdestinationTacuba              -1.019e+00  4.554e-01  -2.238  0.02560 *  
-# busdestinationTexcoco              1.134e+00  2.421e+00   0.468  0.63970    
-# total_seats35                             NA         NA      NA       NA    
-# haversine                          2.162e-04  3.442e-04   0.628  0.53011    
-# urban_typology1                    9.677e-01  3.736e-01   2.590  0.00985 ** 
-# urban_typology2                    4.867e-01  2.303e-01   2.113  0.03504 *  
-# urban_typology3                    7.936e-01  3.753e-01   2.115  0.03490 *  
-# urban_typology4                    1.129e+00  4.598e-01   2.456  0.01436 *  
-# urban_typology5                    2.276e-01  2.338e-01   0.973  0.33077    
-# urban_typology6                    6.421e-01  2.402e-01   2.673  0.00774 ** 
-# urban_typology7                    4.916e-01  3.223e-01   1.525  0.12775    
-# urban_typology9                    5.645e-01  2.868e-01   1.968  0.04956 *  
-# total_passenger_count              4.501e-05  6.071e-03   0.007  0.99409    
-# total_female_count                 3.689e-03  1.909e-02   0.193  0.84680    
-# empty_seats                       -3.222e-04  5.772e-03  -0.056  0.95550    
-# hour7                                     NA         NA      NA       NA    
-# hour12                            -1.770e+00  1.187e+00  -1.491  0.13658    
-# hour13                            -1.749e+00  1.172e+00  -1.492  0.13620    
-# hour14                            -1.556e+00  1.173e+00  -1.327  0.18512    
-# hour15                            -1.621e+00  1.196e+00  -1.355  0.17591    
-# hour16                            -1.610e+00  1.179e+00  -1.365  0.17284    
-# hour17                            -1.765e+00  1.173e+00  -1.505  0.13282    
-# hour18                            -1.676e+00  1.173e+00  -1.428  0.15375    
-# hour19                            -1.009e+00  1.186e+00  -0.850  0.39550    
-# hour20                                    NA         NA      NA       NA    
-# week_day2                          2.084e-01  1.981e-01   1.052  0.29328    
-# week_day3                          1.455e-01  2.004e-01   0.726  0.46797    
-# week_day4                          9.583e-02  2.122e-01   0.452  0.65175    
-# week_day5                         -2.273e-01  1.958e-01  -1.161  0.24615    
-# week_day6                          2.446e-01  2.025e-01   1.208  0.22766    
-# week_day7                         -3.865e-01  2.122e-01  -1.821  0.06908 .  
-# ---
-# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
 # Function to get the metrics of each model and add it to the summaries table
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
@@ -367,130 +206,286 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   return(summaries_table)
 }
 
+
+########################
+## Linear regression model
+
+
+linear_model = lm(train$point_security~., data = train)
+summary(linear_model)
 summaries = getModelMetrics("Initial model",linear_model, NULL, train, test)
+
+# Call:
+# lm(formula = train$point_security ~ ., data = train)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -2.7961 -0.7175  0.0039  0.6678  3.2401 
+
+# Coefficients: (5 not defined because of singularities)
+#                                    Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                       1.341e+00  1.323e+00   1.014  0.31116    
+# inside_or_outsideFuera CETRAM    -1.962e-01  1.335e-01  -1.470  0.14213    
+# gendermale                        3.610e-02  1.054e-01   0.342  0.73217    
+# age18-24                         -9.187e-02  2.092e-01  -0.439  0.66078    
+# age25-44                          1.432e-01  2.056e-01   0.696  0.48648    
+# age45-64                         -8.963e-02  2.267e-01  -0.395  0.69273    
+# age65+                            1.166e-01  3.193e-01   0.365  0.71522    
+# educationMaestria y Doctorado     9.371e-02  6.532e-01   0.143  0.88597    
+# educationPreparatoria             1.301e-01  1.271e-01   1.024  0.30619    
+# educationPrimaria                -2.182e-01  2.258e-01  -0.966  0.33439    
+# educationSecundaria               9.016e-02  1.495e-01   0.603  0.54683    
+# educationSin estudios            -5.722e-01  4.548e-01  -1.258  0.20895    
+# originAtenco                      7.648e-01  1.280e+00   0.597  0.55050    
+# originAtizapan de Zaragoza       -1.503e-01  3.926e-01  -0.383  0.70191    
+# originAzcapotzalco                1.963e-01  3.952e-01   0.497  0.61956    
+# originBenito Juarez               4.174e-01  5.897e-01   0.708  0.47931    
+# originChalco                      1.620e+00  8.183e-01   1.980  0.04822 *  
+# originChimalhuacï¿½ï¿½n     5.263e-01  1.444e+00   0.364  0.71571    
+# originChimalhuacan                1.021e-01  1.367e+00   0.075  0.94048    
+# originCoacalco de Berriozal       2.459e-01  5.805e-01   0.424  0.67204    
+# originCoyoacan                    2.888e-01  7.237e-01   0.399  0.69003    
+# originCuajimalpa de Morelos       3.978e-01  9.338e-01   0.426  0.67031    
+# originCuauhtemoc                  6.084e-01  5.353e-01   1.137  0.25623    
+# originCuauhtlmoc                  1.222e+00  1.304e+00   0.937  0.34910    
+# originCuautitlan                  3.468e-01  1.244e+00   0.279  0.78052    
+# originCuautitlan Izcalli          7.074e-01  9.357e-01   0.756  0.45002    
+# originEcatepec de Morelos        -4.679e-02  4.507e-01  -0.104  0.91735    
+# originGustavo A. Madero           2.035e-01  5.354e-01   0.380  0.70404    
+# originIztacalco                  -5.823e-01  9.327e-01  -0.624  0.53265    
+# originIztapalapa                  1.312e+00  7.804e-01   1.681  0.09337 .  
+# originMagdalena Contreras         1.944e+00  1.265e+00   1.537  0.12502    
+# originMiguel Hidalgo              4.254e-02  5.431e-01   0.078  0.93760    
+# originNaucalpan de Juarez         3.918e-01  6.198e-01   0.632  0.52758    
+# originNextlalplan                -9.873e-03  1.269e+00  -0.008  0.99379    
+# originNezahualcoyotl             -2.351e-01  8.555e-01  -0.275  0.78359    
+# originNicolas Romero              3.756e-01  4.830e-01   0.778  0.43710    
+# originOtro                        7.068e-01  5.612e-01   1.259  0.20846    
+# originTecamec                     4.111e-01  4.652e-01   0.884  0.37725    
+# originTexcoco                    -5.644e-03  9.187e-01  -0.006  0.99510    
+# originTlalnepantla de Baz         1.245e-01  4.131e-01   0.301  0.76322    
+# originTlalpan                     8.042e-01  9.381e-01   0.857  0.39170    
+# originTultitlan                   4.729e-01  7.289e-01   0.649  0.51680    
+# originVenustiano Carranza         6.058e-02  7.916e-01   0.077  0.93903    
+# originZumpango                    1.877e-01  1.243e+00   0.151  0.88000    
+# destinationAtenco                -8.118e-01  2.007e+00  -0.405  0.68598    
+# destinationAtizapan de Zaragoza   7.560e-01  8.687e-01   0.870  0.38460    
+# destinationAzcapotzalco           1.067e+00  8.724e-01   1.223  0.22189    
+# destinationBenito Juarez         -3.889e-02  1.047e+00  -0.037  0.97038    
+# destinationChimalhuacan          -7.695e-01  1.638e+00  -0.470  0.63875    
+# destinationCoacalco de Berriozal  2.590e-01  9.787e-01   0.265  0.79142    
+# destinationCocotitlan            -6.461e-01  1.478e+00  -0.437  0.66222    
+# destinationCoyoacan               1.030e+00  1.505e+00   0.685  0.49391    
+# destinationCuajimalpa de Morelos  2.267e+00  1.082e+00   2.094  0.03670 *  
+# destinationCuauhtemoc             4.795e-01  9.668e-01   0.496  0.62011    
+# destinationCuautitlan            -5.841e-01  1.536e+00  -0.380  0.70381    
+# destinationCuautitlan Izcalli    -2.888e-01  1.133e+00  -0.255  0.79888    
+# destinationEcatepec de Morelos    1.963e-01  9.259e-01   0.212  0.83217    
+# destinationGustavo A. Madero     -3.368e-01  1.038e+00  -0.324  0.74575    
+# destinationIztapalapa             1.265e+00  1.444e+00   0.876  0.38125    
+# destinationMiguel Hidalgo         7.637e-01  1.057e+00   0.723  0.47017    
+# destinationNaucalpan de Juarez    3.374e-01  9.392e-01   0.359  0.71959    
+# destinationNezahualcoyotl        -5.972e-02  1.145e+00  -0.052  0.95842    
+# destinationNicolas Romero         1.041e-01  9.421e-01   0.110  0.91208    
+# destinationOtro                   4.141e-01  9.682e-01   0.428  0.66905    
+# destinationTecamec                5.418e-01  9.303e-01   0.582  0.56054    
+# destinationTemamatla             -1.654e+00  1.419e+00  -1.165  0.24454    
+# destinationTizayuca               2.010e+00  1.516e+00   1.326  0.18548    
+# destinationTlalnepantla de Baz    8.398e-01  8.780e-01   0.956  0.33930    
+# destinationTlalpan                2.441e+00  1.445e+00   1.689  0.09184 .  
+# destinationTultitlan              1.799e+00  1.494e+00   1.204  0.22918    
+# destinationVenustiano Carranza    7.714e-01  1.100e+00   0.701  0.48338    
+# companions3 to 4                 -1.446e-01  2.286e-01  -0.633  0.52719    
+# companionsMas                    -1.201e+00  5.374e-01  -2.234  0.02590 *  
+# companionsNone                   -1.774e-01  1.187e-01  -1.495  0.13563    
+# trip_purposeEstudio               2.672e-01  2.471e-01   1.081  0.28009    
+# trip_purposeOtro                  4.481e-03  1.778e-01   0.025  0.97990    
+# trip_purposeRecreacion            9.278e-02  2.017e-01   0.460  0.64575    
+# trip_purposeTrabajo              -1.036e-01  1.656e-01  -0.626  0.53191    
+# mode_security2                    5.583e-01  1.782e-01   3.132  0.00183 ** 
+# mode_security3                    9.741e-01  1.379e-01   7.066 5.15e-12 ***
+# mode_security4                    1.239e+00  1.709e-01   7.248 1.54e-12 ***
+# mode_security5                    1.684e+00  2.119e-01   7.946 1.20e-14 ***
+# importance_safety2                6.966e-01  6.434e-01   1.083  0.27946    
+# importance_safety3                5.970e-01  4.736e-01   1.260  0.20810    
+# importance_safety4                5.476e-01  4.518e-01   1.212  0.22601    
+# importance_safety5                4.510e-01  4.181e-01   1.079  0.28122    
+# importance_safetyI                2.395e+00  1.262e+00   1.898  0.05822 .  
+# most_safeMetro                   -2.112e-02  1.395e-01  -0.151  0.87970    
+# most_safePeseros                  2.897e-02  2.513e-01   0.115  0.90827    
+# most_safeTaxi                     1.400e-02  1.694e-01   0.083  0.93415    
+# most_safeTrolebus                 2.210e-01  2.474e-01   0.893  0.37216    
+# least_safeMetro                   3.150e-01  3.137e-01   1.004  0.31576    
+# least_safePeseros                 9.721e-02  2.535e-01   0.384  0.70146    
+# least_safeTaxi                    4.669e-02  2.778e-01   0.168  0.86663    
+# least_safeTrolebus               -5.329e-02  3.855e-01  -0.138  0.89011    
+# bus_or_pedVan                    -8.975e-02  2.122e-01  -0.423  0.67256    
+# base_study_zoneEl Rosario         7.317e-02  3.530e-01   0.207  0.83588    
+# busdestinationHeroes Tecamec      1.843e-01  2.037e-01   0.905  0.36604    
+# busdestinationMexico Nueva        3.089e-02  1.808e-01   0.171  0.86439    
+# busdestinationMexipuerto                 NA         NA      NA       NA    
+# busdestinationTacuba             -6.080e-01  4.961e-01  -1.226  0.22090    
+# busdestinationTexcoco                    NA         NA      NA       NA    
+# total_seats35                            NA         NA      NA       NA    
+# haversine                         7.858e-05  3.576e-04   0.220  0.82616    
+# urban_typology1                   4.126e-01  3.842e-01   1.074  0.28329    
+# urban_typology2                   4.621e-01  2.411e-01   1.917  0.05577 .  
+# urban_typology3                   8.002e-01  4.221e-01   1.896  0.05854 .  
+# urban_typology4                   6.190e-01  4.960e-01   1.248  0.21259    
+# urban_typology5                   1.190e-01  2.459e-01   0.484  0.62879    
+# urban_typology6                   4.460e-01  2.541e-01   1.755  0.07982 .  
+# urban_typology7                   3.088e-01  3.683e-01   0.839  0.40211    
+# urban_typology9                   4.731e-01  2.869e-01   1.649  0.09983 .  
+# total_passenger_count             8.119e-04  6.546e-03   0.124  0.90135    
+# total_female_count               -1.844e-02  2.212e-02  -0.834  0.40482    
+# empty_seats                      -1.343e-03  6.216e-03  -0.216  0.82899    
+# hour7                                    NA         NA      NA       NA    
+# hour12                           -1.031e+00  4.015e-01  -2.568  0.01051 *  
+# hour13                           -1.151e+00  3.520e-01  -3.271  0.00114 ** 
+# hour14                           -9.602e-01  3.419e-01  -2.808  0.00517 ** 
+# hour15                           -1.058e+00  4.048e-01  -2.614  0.00921 ** 
+# hour16                           -8.907e-01  3.722e-01  -2.393  0.01707 *  
+# hour17                           -1.094e+00  3.456e-01  -3.166  0.00164 ** 
+# hour18                           -9.899e-01  3.486e-01  -2.839  0.00470 ** 
+# hour19                                   NA         NA      NA       NA    
+# week_day2                         3.426e-01  2.047e-01   1.674  0.09480 .  
+# week_day3                         4.161e-01  2.185e-01   1.905  0.05737 .  
+# week_day4                         2.077e-01  2.341e-01   0.887  0.37533    
+# week_day5                        -3.688e-02  2.123e-01  -0.174  0.86215    
+# week_day6                         3.993e-01  2.066e-01   1.933  0.05375 .  
+# week_day7                        -4.198e-01  2.175e-01  -1.931  0.05409 .  
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Residual standard error: 1.132 on 520 degrees of freedom
+# Multiple R-squared:  0.4058,  Adjusted R-squared:  0.2641 
+# F-statistic: 2.864 on 124 and 520 DF,  p-value: < 2.2e-16
 
 # Taking out the least relevant variables
 linear_model2 = lm(train$point_security~. 
-                   -bus_or_ped -inside_or_outside -gender -age -education 
-                   -companions - trip_purpose -importance_safety -least_safe
+                   -inside_or_outside -gender -age -education
+                   -trip_purpose -most_safe -least_safe -bus_or_ped
+                   -base_study_zone -busdestination -total_seats -haversine
                    -total_passenger_count -total_female_count -empty_seats
-                   -base_study_zone -total_seats -haversine
-                   -hour, data = train)
+                   , data = train)
 summary(linear_model2)
 summaries = getModelMetrics("Relevant variables",linear_model2, summaries, train, test)
 
 
-#Call:
-  # lm(formula = train$point_security ~ . - bus_or_ped - inside_or_outside - 
-  #     gender - age - education - companions - trip_purpose - importance_safety - 
-  #     least_safe - total_passenger_count - total_female_count - 
-  #     empty_seats - base_study_zone - total_seats - haversine - 
-  #     hour, data = train)
-  
-  # Residuals:
-  #     Min      1Q  Median      3Q     Max 
-  # -3.0145 -0.7063  0.0000  0.6799  3.3167 
-  
-  # Coefficients: (1 not defined because of singularities)
+# Call:
+# lm(formula = train$point_security ~ . - inside_or_outside - gender - 
+#     age - education - trip_purpose - most_safe - least_safe - 
+#     bus_or_ped - base_study_zone - busdestination - total_seats - 
+#     haversine - total_passenger_count - total_female_count - 
+#     empty_seats, data = train)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -2.7498 -0.7347  0.0267  0.7169  3.5152 
+
+# Coefficients: (2 not defined because of singularities)
 #                                   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                        1.11420    0.51865   2.148 0.032096 *  
-# originAcolman                     -1.07145    1.40904  -0.760 0.447307    
-# originAlvaro Obregon              -1.60651    0.88166  -1.822 0.068936 .  
-# originAtenco                      -0.61575    1.37045  -0.449 0.653378    
-# originAtizapan de Zaragoza        -1.96831    0.80772  -2.437 0.015107 *  
-# originAzcapotzalco                -1.74585    0.81415  -2.144 0.032407 *  
-# originBenito Juarez               -1.33130    0.89172  -1.493 0.135981    
-# originChimalhuacï¿½ï¿½n     -0.71219    1.47218  -0.484 0.628728    
-# originCoacalco de Berriozal       -1.75886    0.88776  -1.981 0.048026 *  
-# originCoyoacan                    -2.27339    1.11843  -2.033 0.042529 *  
-# originCuajimalpa de Morelos       -1.16158    1.36232  -0.853 0.394197    
-# originCuauhtemoc                  -1.92170    0.86354  -2.225 0.026431 *  
-# originCuauhtlmoc                  -1.00658    1.41855  -0.710 0.478241    
-# originCuautitlan                  -1.61318    1.36364  -1.183 0.237284    
-# originCuautitlan Izcalli          -0.99574    1.14724  -0.868 0.385775    
-# originEcatepec de Morelos         -1.88351    0.83931  -2.244 0.025191 *  
-# originGustavo A. Madero           -1.45615    0.87385  -1.666 0.096165 .  
-# originIxtapaluca                  -1.81199    1.37502  -1.318 0.188081    
-# originIztacalco                   -2.75860    1.13038  -2.440 0.014961 *  
-# originIztapalapa                  -0.70059    1.03950  -0.674 0.500589    
-# originMagdalena Contreras         -0.14982    1.39622  -0.107 0.914583    
-# originMiguel Hidalgo              -1.74357    0.90726  -1.922 0.055108 .  
-# originNaucalpan de Juarez         -1.64099    0.89666  -1.830 0.067734 .  
-# originNextlalplan                 -2.48058    1.39467  -1.779 0.075813 .  
-# originNezahualcoyotl              -1.73486    1.39538  -1.243 0.214252    
-# originNicolas Romero              -2.00213    0.85094  -2.353 0.018955 *  
-# originOtro                        -1.58399    0.91240  -1.736 0.083071 .  
-# originTecamec                     -1.40580    0.84484  -1.664 0.096642 .  
-# originTexcoco                     -1.85636    1.12226  -1.654 0.098628 .  
-# originTiahuac                     -0.59596    1.17811  -0.506 0.613139    
-# originTlalnepantla de Baz         -1.69397    0.81573  -2.077 0.038264 *  
-# originTlalpan                     -1.25214    1.11815  -1.120 0.263239    
-# originTultitlan                   -1.17114    0.93059  -1.258 0.208709    
-# originVenustiano Carranza         -1.95097    1.13839  -1.714 0.087088 .  
-# originZumpango                    -1.01452    1.45298  -0.698 0.485303    
-# destinationAlvaro Obregon          1.39970    1.21232   1.155 0.248733    
-# destinationAtenco                  0.27535    1.83207   0.150 0.880581    
-# destinationAtizapan de Zaragoza    2.19091    0.89872   2.438 0.015068 *  
-# destinationAzcapotzalco            2.15907    0.90085   2.397 0.016851 *  
-# destinationBenito Juarez           1.75233    1.03509   1.693 0.090992 .  
-# destinationChimalhuacan            1.77936    1.44803   1.229 0.219628    
-# destinationCoacalco de Berriozal   2.01993    0.95572   2.114 0.034972 *  
-# destinationCoyoacan                1.88367    1.19554   1.576 0.115653    
-# destinationCuajimalpa de Morelos   3.62295    1.06702   3.395 0.000731 ***
-# destinationCuauhtemoc              1.77857    1.00321   1.773 0.076760 .  
-# destinationCuautitlan              0.96965    1.19179   0.814 0.416196    
-# destinationCuautitlan Izcalli      1.55492    1.41854   1.096 0.273460    
-# destinationEcatepec de Morelos     1.91256    0.91707   2.086 0.037447 *  
-# destinationGustavo A. Madero       1.56421    1.00357   1.559 0.119614    
-# destinationIztacalco               1.18561    1.43254   0.828 0.408212    
-# destinationIztapalapa              2.90540    1.42432   2.040 0.041807 *  
-# destinationMiguel Hidalgo          2.56499    0.98249   2.611 0.009263 ** 
-# destinationNaucalpan de Juarez     1.97191    0.90369   2.182 0.029495 *  
-# destinationNezahualcoyotl          1.25428    1.03855   1.208 0.227633    
-# destinationNicolas Romero          1.51013    0.94023   1.606 0.108775    
-# destinationOtro                    2.11537    0.97530   2.169 0.030481 *  
-# destinationTecamec                 1.95043    0.91857   2.123 0.034139 *  
-# destinationTemamatla              -0.26220    1.35327  -0.194 0.846435    
-# destinationTeotihuacï¿½ï¿½n       NA         NA      NA       NA    
-# destinationTizayuca                2.80327    1.45144   1.931 0.053912 .  
-# destinationTlalnepantla de Baz     2.17246    0.90798   2.393 0.017037 *  
-# destinationTlalpan                 3.28544    1.19900   2.740 0.006326 ** 
-# destinationTultitlan               2.37324    1.19819   1.981 0.048086 *  
-# destinationVenustiano Carranza     2.22002    1.10047   2.017 0.044108 *  
-# mode_security2                     0.44706    0.15933   2.806 0.005183 ** 
-# mode_security3                     0.94348    0.11874   7.946 9.71e-15 ***
-# mode_security4                     1.38436    0.13992   9.894  < 2e-16 ***
-# mode_security5                     1.35588    0.19191   7.065 4.51e-12 ***
-# most_safeBRT                       0.36547    0.29071   1.257 0.209189    
-# most_safeMetro                     0.37813    0.28199   1.341 0.180458    
-# most_safePeseros                   0.62921    0.33362   1.886 0.059785 .  
-# most_safeTaxi                      0.51449    0.29292   1.756 0.079527 .  
-# most_safeTrolebus                  0.78705    0.32615   2.413 0.016115 *  
-# busdestinationHeroes Tecamec      -0.08652    0.28603  -0.302 0.762392    
-# busdestinationMexico Nueva        -0.07865    0.15203  -0.517 0.605113    
-# busdestinationMexipuerto          -0.37165    0.28028  -1.326 0.185342    
-# busdestinationTacuba              -0.92155    0.41656  -2.212 0.027326 *  
-# busdestinationTexcoco              0.87726    2.23261   0.393 0.694512    
-# urban_typology1                    0.86383    0.25988   3.324 0.000942 ***
-# urban_typology2                    0.38534    0.21042   1.831 0.067557 .  
-# urban_typology3                    0.68098    0.31545   2.159 0.031271 *  
-# urban_typology4                    1.02457    0.41333   2.479 0.013458 *  
-# urban_typology5                    0.18459    0.22007   0.839 0.401949    
-# urban_typology6                    0.51555    0.21951   2.349 0.019166 *  
-# urban_typology7                    0.38537    0.29810   1.293 0.196597    
-# urban_typology9                    0.47988    0.25313   1.896 0.058480 .  
-# week_day2                          0.09795    0.16937   0.578 0.563274    
-# week_day3                          0.02108    0.17206   0.123 0.902538    
-# week_day4                          0.03999    0.18792   0.213 0.831566    
-# week_day5                         -0.30501    0.17112  -1.782 0.075187 .  
-# week_day6                          0.09364    0.17847   0.525 0.599994    
-# week_day7                         -0.36155    0.18900  -1.913 0.056238 .  
+# (Intercept)                       1.643865   1.088766   1.510 0.131656    
+# originAtenco                      0.979259   1.206717   0.812 0.417425    
+# originAtizapan de Zaragoza       -0.111396   0.371074  -0.300 0.764139    
+# originAzcapotzalco                0.250690   0.379084   0.661 0.508692    
+# originBenito Juarez               0.492045   0.566117   0.869 0.385138    
+# originChalco                      1.274909   0.791412   1.611 0.107767    
+# originChimalhuacï¿½ï¿½n     0.694904   1.385436   0.502 0.616165    
+# originChimalhuacan                0.013475   1.254001   0.011 0.991430    
+# originCoacalco de Berriozal       0.091676   0.546502   0.168 0.866841    
+# originCoyoacan                    0.326179   0.699528   0.466 0.641196    
+# originCuajimalpa de Morelos       0.422156   0.898985   0.470 0.638833    
+# originCuauhtemoc                  0.470304   0.509906   0.922 0.356757    
+# originCuauhtlmoc                  1.080275   1.255609   0.860 0.389965    
+# originCuautitlan                  0.389037   1.214002   0.320 0.748742    
+# originCuautitlan Izcalli          0.829418   0.913444   0.908 0.364268    
+# originEcatepec de Morelos        -0.143333   0.428366  -0.335 0.738051    
+# originGustavo A. Madero           0.210962   0.517140   0.408 0.683477    
+# originIztacalco                  -0.478164   0.891406  -0.536 0.591887    
+# originIztapalapa                  1.464897   0.753664   1.944 0.052439 .  
+# originMagdalena Contreras         1.647572   1.240645   1.328 0.184728    
+# originMiguel Hidalgo              0.048617   0.526183   0.092 0.926418    
+# originNaucalpan de Juarez         0.575851   0.586730   0.981 0.326797    
+# originNextlalplan                -0.563674   1.227455  -0.459 0.646256    
+# originNezahualcoyotl             -0.463355   0.821278  -0.564 0.572855    
+# originNicolas Romero              0.293640   0.455994   0.644 0.519872    
+# originOtro                        0.917971   0.537156   1.709 0.088023 .  
+# originTecamec                     0.364551   0.432470   0.843 0.399621    
+# originTexcoco                     0.049386   0.888758   0.056 0.955706    
+# originTlalnepantla de Baz         0.163419   0.394497   0.414 0.678854    
+# originTlalpan                     0.874425   0.887833   0.985 0.325106    
+# originTultitlan                   0.587433   0.696419   0.844 0.399311    
+# originVenustiano Carranza        -0.004329   0.763279  -0.006 0.995477    
+# originZumpango                    0.489664   1.215766   0.403 0.687280    
+# destinationAtenco                -1.239409   1.888710  -0.656 0.511956    
+# destinationAtizapan de Zaragoza   0.557121   0.841097   0.662 0.508008    
+# destinationAzcapotzalco           0.834720   0.841306   0.992 0.321549    
+# destinationBenito Juarez         -0.314957   0.996805  -0.316 0.752147    
+# destinationChimalhuacan          -1.003572   1.546338  -0.649 0.516609    
+# destinationCoacalco de Berriozal  0.106361   0.934207   0.114 0.909397    
+# destinationCocotitlan            -0.788187   1.429000  -0.552 0.581470    
+# destinationCoyoacan               0.548198   1.458092   0.376 0.707084    
+# destinationCuajimalpa de Morelos  2.300784   1.033202   2.227 0.026360 *  
+# destinationCuauhtemoc             0.351624   0.920672   0.382 0.702667    
+# destinationCuautitlan            -0.460503   1.475692  -0.312 0.755113    
+# destinationCuautitlan Izcalli    -0.081552   1.098474  -0.074 0.940845    
+# destinationEcatepec de Morelos    0.086385   0.869163   0.099 0.920866    
+# destinationGustavo A. Madero     -0.420416   0.995992  -0.422 0.673111    
+# destinationIztapalapa             1.101183   1.414569   0.778 0.436632    
+# destinationMiguel Hidalgo         0.677219   0.968706   0.699 0.484786    
+# destinationNaucalpan de Juarez    0.144256   0.912771   0.158 0.874482    
+# destinationNezahualcoyotl        -0.335009   1.086792  -0.308 0.758005    
+# destinationNicolas Romero        -0.214073   0.901632  -0.237 0.812413    
+# destinationOtro                   0.176351   0.927710   0.190 0.849307    
+# destinationTecamec                0.496343   0.876460   0.566 0.571417    
+# destinationTemamatla             -2.181717   1.336187  -1.633 0.103083    
+# destinationTizayuca               1.812967   1.445098   1.255 0.210168    
+# destinationTlalnepantla de Baz    0.627228   0.847764   0.740 0.459699    
+# destinationTlalpan                2.452382   1.403576   1.747 0.081152 .  
+# destinationTultitlan              2.036457   1.429643   1.424 0.154881    
+# destinationVenustiano Carranza    0.591013   1.063192   0.556 0.578514    
+# companions3 to 4                 -0.016265   0.217405  -0.075 0.940390    
+# companionsMas                    -1.250517   0.516698  -2.420 0.015833 *  
+# companionsNone                   -0.163402   0.108764  -1.502 0.133577    
+# mode_security2                    0.584622   0.170528   3.428 0.000653 ***
+# mode_security3                    1.012683   0.127997   7.912  1.4e-14 ***
+# mode_security4                    1.304934   0.153138   8.521  < 2e-16 ***
+# mode_security5                    1.686074   0.198780   8.482  < 2e-16 ***
+# importance_safety2                0.541190   0.623279   0.868 0.385610    
+# importance_safety3                0.507298   0.451884   1.123 0.262083    
+# importance_safety4                0.447732   0.434826   1.030 0.303610    
+# importance_safety5                0.368036   0.400399   0.919 0.358407    
+# importance_safetyI                2.111643   1.220735   1.730 0.084223 .  
+# urban_typology1                   0.366253   0.271030   1.351 0.177141    
+# urban_typology2                   0.404214   0.214221   1.887 0.059698 .  
+# urban_typology3                   0.639625   0.350632   1.824 0.068662 .  
+# urban_typology4                   0.623811   0.456694   1.366 0.172518    
+# urban_typology5                   0.115212   0.228825   0.503 0.614817    
+# urban_typology6                   0.328155   0.228485   1.436 0.151505    
+# urban_typology7                   0.246049   0.341879   0.720 0.472016    
+# urban_typology9                   0.447640   0.253294   1.767 0.077735 .  
+# hour7                                   NA         NA      NA       NA    
+# hour12                           -0.894528   0.372982  -2.398 0.016802 *  
+# hour13                           -0.978456   0.331900  -2.948 0.003333 ** 
+# hour14                           -0.928182   0.328223  -2.828 0.004856 ** 
+# hour15                           -0.882030   0.380376  -2.319 0.020768 *  
+# hour16                           -0.752429   0.345896  -2.175 0.030031 *  
+# hour17                           -1.039501   0.328649  -3.163 0.001648 ** 
+# hour18                           -0.921586   0.334581  -2.754 0.006073 ** 
+# hour19                                  NA         NA      NA       NA    
+# week_day2                         0.342536   0.183897   1.863 0.063043 .  
+# week_day3                         0.353165   0.199985   1.766 0.077956 .  
+# week_day4                         0.112569   0.207189   0.543 0.587132    
+# week_day5                        -0.066419   0.192254  -0.345 0.729867    
+# week_day6                         0.346991   0.191084   1.816 0.069927 .  
+# week_day7                        -0.379511   0.200781  -1.890 0.059258 .  
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.088 on 595 degrees of freedom
-# Multiple R-squared:  0.373,	Adjusted R-squared:  0.2781 
-# F-statistic: 3.932 on 90 and 595 DF,  p-value: < 2.2e-16
+# Residual standard error: 1.122 on 552 degrees of freedom
+# Multiple R-squared:  0.3809,  Adjusted R-squared:  0.2777 
+# F-statistic: 3.692 on 92 and 552 DF,  p-value: < 2.2e-16
 
 
 # Only trip variables
@@ -500,95 +495,172 @@ summary(linear_model3)
 summaries = getModelMetrics("Trip variables",linear_model3, summaries, train, test)
 
 
-#Call:
-  # lm(formula = train$point_security ~ +origin + destination + companions + 
-  #     trip_purpose, data = train)
-  
-  # Residuals:
-  #      Min       1Q   Median       3Q      Max 
-  # -2.64649 -1.05939  0.05793  0.78433  2.84390 
-  
-  # Coefficients: (1 not defined because of singularities)
-  #                                    Estimate Std. Error t value Pr(>|t|)    
-  # (Intercept)                        2.640083   0.422911   6.243 8.03e-10 ***
-  # originAcolman                     -1.122587   1.406023  -0.798  0.42494    
-# originAlvaro Obregon              -1.528978   0.989054  -1.546  0.12264    
-# originAtenco                      -0.666260   1.400353  -0.476  0.63440    
-# originAtizapan de Zaragoza        -1.715412   0.906295  -1.893  0.05886 .  
-# originAzcapotzalco                -1.452473   0.909727  -1.597  0.11087    
-# originBenito Juarez               -1.056001   0.998062  -1.058  0.29045    
-# originChimalhuacï¿½ï¿½n     -0.780358   1.645876  -0.474  0.63558    
-# originCoacalco de Berriozal       -1.563134   0.988300  -1.582  0.11425    
-# originCoyoacan                    -2.105880   1.246498  -1.689  0.09164 .  
-# originCuajimalpa de Morelos       -0.747200   1.528449  -0.489  0.62511    
-# originCuauhtemoc                  -1.890462   0.963912  -1.961  0.05030 .  
-# originCuauhtlmoc                   0.488137   1.530605   0.319  0.74990    
-# originCuautitlan                  -2.031709   1.533796  -1.325  0.18579    
-# originCuautitlan Izcalli           0.300633   1.298375   0.232  0.81697    
-# originEcatepec de Morelos         -1.695531   0.931492  -1.820  0.06921 .  
-# originGustavo A. Madero           -1.362023   0.977434  -1.393  0.16398    
-# originIxtapaluca                  -1.529380   1.523665  -1.004  0.31589    
-# originIztacalco                   -3.706179   1.266553  -2.926  0.00356 ** 
-# originIztapalapa                   0.238311   1.155476   0.206  0.83667    
-# originMagdalena Contreras         -0.005112   1.555441  -0.003  0.99738    
-# originMiguel Hidalgo              -1.537718   1.008270  -1.525  0.12775    
-# originNaucalpan de Juarez         -1.363759   1.012280  -1.347  0.17841    
-# originNextlalplan                 -2.851635   1.539693  -1.852  0.06449 .  
-# originNezahualcoyotl              -2.233500   1.543253  -1.447  0.14833    
-# originNicolas Romero              -1.686004   0.948339  -1.778  0.07592 .  
-# originOtro                        -1.206654   1.015882  -1.188  0.23538    
-# originTecamec                     -1.286903   0.935724  -1.375  0.16954    
-# originTexcoco                     -2.589459   1.263329  -2.050  0.04082 *  
-# originTiahuac                     -1.357259   1.401099  -0.969  0.33307    
-# originTlalnepantla de Baz         -1.354082   0.914202  -1.481  0.13908    
-# originTlalpan                     -1.147916   1.257449  -0.913  0.36166    
-# originTultitlan                   -0.853119   1.032342  -0.826  0.40890    
-# originVenustiano Carranza         -1.050430   1.268473  -0.828  0.40793    
-# originZumpango                    -1.718201   1.589868  -1.081  0.28025    
-# destinationAlvaro Obregon          0.970280   1.443401   0.672  0.50170    
-# destinationAtenco                  0.006085   1.683355   0.004  0.99712    
-# destinationAtizapan de Zaragoza    1.409192   1.131746   1.245  0.21355    
-# destinationAzcapotzalco            1.501920   1.113557   1.349  0.17791    
-# destinationBenito Juarez           1.094869   1.257730   0.871  0.38436    
-# destinationChimalhuacan            0.515071   1.681965   0.306  0.75953    
-# destinationCoacalco de Berriozal   0.477741   1.186463   0.403  0.68734    
-# destinationCoyoacan                1.220653   1.422242   0.858  0.39108    
-# destinationCuajimalpa de Morelos   2.942860   1.304782   2.255  0.02446 *  
-# destinationCuauhtemoc              0.641215   1.222402   0.525  0.60008    
-# destinationCuautitlan              0.478702   1.434584   0.334  0.73873    
-# destinationCuautitlan Izcalli      1.534952   1.665674   0.922  0.35714    
-# destinationEcatepec de Morelos     0.671175   1.148941   0.584  0.55932    
-# destinationGustavo A. Madero       0.852780   1.238375   0.689  0.49132    
-# destinationIztacalco              -0.641847   1.662802  -0.386  0.69963    
-# destinationIztapalapa              2.272013   1.674271   1.357  0.17527    
-# destinationMiguel Hidalgo          1.828052   1.209234   1.512  0.13111    
-# destinationNaucalpan de Juarez     1.316209   1.129418   1.165  0.24431    
-# destinationNezahualcoyotl          0.131793   1.273954   0.103  0.91764    
-# destinationNicolas Romero          0.824652   1.170329   0.705  0.48131    
-# destinationOtro                    1.330747   1.205780   1.104  0.27018    
-# destinationTecamec                 0.895493   1.151453   0.778  0.43704    
-# destinationTemamatla              -1.576318   1.599260  -0.986  0.32469    
-# destinationTeotihuacï¿½ï¿½n        NA         NA      NA       NA    
-# destinationTizayuca                2.338272   1.680509   1.391  0.16461    
-# destinationTlalnepantla de Baz     1.331403   1.139590   1.168  0.24313    
-# destinationTlalpan                 2.800899   1.422449   1.969  0.04939 *  
-# destinationTultitlan               0.857705   1.436084   0.597  0.55056    
-# destinationVenustiano Carranza     1.015615   1.330763   0.763  0.44565    
-# companions1 to 2                  -0.361395   0.569563  -0.635  0.52598    
-# companions3 to 4                  -0.419899   0.595327  -0.705  0.48088    
-# companionsMas                     -0.583242   0.717135  -0.813  0.41637    
-# companionsNone                    -0.301123   0.561214  -0.537  0.59177    
-# trip_purposeCompra                 1.108767   0.661638   1.676  0.09429 .  
-# trip_purposeEstudio                1.309605   0.668854   1.958  0.05068 .  
-# trip_purposeOtro                   1.059320   0.653803   1.620  0.10569    
-# trip_purposeRecreacion             1.018299   0.660156   1.543  0.12346    
-# trip_purposeTrabajo                0.841500   0.644516   1.306  0.19217    
+# Call:
+# lm(formula = train$point_security ~ +origin + destination + companions + 
+#     trip_purpose, data = train)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -2.9250 -1.0278  0.0000  0.8448  2.9722 
+
+# Coefficients:
+#                                   Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                       2.611822   0.980897   2.663  0.00797 **
+# originAtenco                      0.881880   1.334245   0.661  0.50890   
+# originAtizapan de Zaragoza        0.178951   0.402545   0.445  0.65681   
+# originAzcapotzalco                0.507278   0.413073   1.228  0.21993   
+# originBenito Juarez               0.776108   0.617109   1.258  0.20903   
+# originChalco                      2.093300   0.863850   2.423  0.01569 * 
+# originChimalhuacï¿½ï¿½n     1.053309   1.533971   0.687  0.49258   
+# originChimalhuacan                1.117159   1.322921   0.844  0.39876   
+# originCoacalco de Berriozal       0.234221   0.595043   0.394  0.69401   
+# originCoyoacan                    0.986337   0.745096   1.324  0.18610   
+# originCuajimalpa de Morelos       1.228008   0.983115   1.249  0.21213   
+# originCuauhtemoc                  0.173926   0.562196   0.309  0.75715   
+# originCuauhtlmoc                  2.386781   1.317742   1.811  0.07062 . 
+# originCuautitlan                 -0.428701   1.346560  -0.318  0.75032   
+# originCuautitlan Izcalli          1.670535   0.994937   1.679  0.09369 . 
+# originEcatepec de Morelos         0.145352   0.466227   0.312  0.75533   
+# originGustavo A. Madero           0.171865   0.566031   0.304  0.76152   
+# originIztacalco                  -1.673964   0.985028  -1.699  0.08978 . 
+# originIztapalapa                  2.142445   0.830062   2.581  0.01009 * 
+# originMagdalena Contreras         2.197924   1.353649   1.624  0.10498   
+# originMiguel Hidalgo              0.353976   0.576227   0.614  0.53926   
+# originNaucalpan de Juarez         0.724791   0.641771   1.129  0.25921   
+# originNextlalplan                -0.882501   1.338698  -0.659  0.51002   
+# originNezahualcoyotl             -0.691868   0.889433  -0.778  0.43696   
+# originNicolas Romero              0.579448   0.493014   1.175  0.24035   
+# originOtro                        1.227535   0.591691   2.075  0.03846 * 
+# originTecamec                     0.566570   0.475659   1.191  0.23409   
+# originTexcoco                    -0.625663   0.986717  -0.634  0.52628   
+# originTlalnepantla de Baz         0.239641   0.431327   0.556  0.57871   
+# originTlalpan                     0.876996   0.974301   0.900  0.36843   
+# originTultitlan                   0.675264   0.762397   0.886  0.37614   
+# originVenustiano Carranza         0.673116   0.839896   0.801  0.42321   
+# originZumpango                    1.104653   1.328464   0.832  0.40602   
+# destinationAtenco                -0.510302   2.021175  -0.252  0.80076   
+# destinationAtizapan de Zaragoza   0.271019   0.907153   0.299  0.76523   
+# destinationAzcapotzalco           0.565001   0.915242   0.617  0.53726   
+# destinationBenito Juarez         -0.217462   1.079339  -0.201  0.84040   
+# destinationChimalhuacan          -0.446377   1.568585  -0.285  0.77607   
+# destinationCoacalco de Berriozal -0.476367   1.012370  -0.471  0.63814   
+# destinationCocotitlan            -1.446377   1.568585  -0.922  0.35687   
+# destinationCoyoacan               0.221136   1.561107   0.142  0.88740   
+# destinationCuajimalpa de Morelos  2.013941   1.125304   1.790  0.07403 . 
+# destinationCuauhtemoc             0.389961   1.009321   0.386  0.69937   
+# destinationCuautitlan            -0.877095   1.649447  -0.532  0.59510   
+# destinationCuautitlan Izcalli    -0.092341   1.206156  -0.077  0.93900   
+# destinationEcatepec de Morelos   -0.418524   0.941456  -0.445  0.65681   
+# destinationGustavo A. Madero     -0.412855   1.072420  -0.385  0.70040   
+# destinationIztapalapa             1.191698   1.539804   0.774  0.43929   
+# destinationMiguel Hidalgo         0.824194   1.049322   0.785  0.43251   
+# destinationNaucalpan de Juarez    0.278143   0.984933   0.282  0.77774   
+# destinationNezahualcoyotl        -0.827811   1.185878  -0.698  0.48542   
+# destinationNicolas Romero        -0.498948   0.971875  -0.513  0.60788   
+# destinationOtro                  -0.067092   1.008852  -0.067  0.94700   
+# destinationTecamec               -0.004186   0.942987  -0.004  0.99646   
+# destinationTemamatla             -2.643419   1.465154  -1.804  0.07172 . 
+# destinationTizayuca               1.524302   1.578632   0.966  0.33466   
+# destinationTlalnepantla de Baz    0.312194   0.917711   0.340  0.73384   
+# destinationTlalpan                2.046547   1.566511   1.306  0.19192   
+# destinationTultitlan              1.490703   1.560220   0.955  0.33975   
+# destinationVenustiano Carranza    0.167887   1.167855   0.144  0.88574   
+# companions3 to 4                  0.016600   0.237972   0.070  0.94441   
+# companionsMas                    -0.704801   0.551077  -1.279  0.20143   
+# companionsNone                   -0.072599   0.121991  -0.595  0.55200   
+# trip_purposeEstudio               0.235279   0.245394   0.959  0.33807   
+# trip_purposeOtro                 -0.110849   0.184496  -0.601  0.54820   
+# trip_purposeRecreacion           -0.208877   0.201985  -1.034  0.30151   
+# trip_purposeTrabajo              -0.238199   0.169932  -1.402  0.16153   
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.225 on 614 degrees of freedom
-# Multiple R-squared:  0.1793,	Adjusted R-squared:  0.08438 
-# F-statistic: 1.889 on 71 and 614 DF,  p-value: 4.017e-05
+# Residual standard error: 1.253 on 578 degrees of freedom
+# Multiple R-squared:  0.1919,  Adjusted R-squared:  0.09965 
+# F-statistic:  2.08 on 66 and 578 DF,  p-value: 4.667e-06
+
+# Only significant variables for the trip
+
+linear_model3a = lm(train$point_security~ +origin +destination, data = train)
+summary(linear_model3a)
+summaries = getModelMetrics("Trip variables - Relevant",linear_model3a, summaries, train, test)
+
+# Call:
+# lm(formula = train$point_security ~ +origin + destination, data = train)
+
+# Residuals:
+#      Min       1Q   Median       3Q      Max 
+# -3.00524 -1.13644  0.04278  0.86356  2.86356 
+
+# Coefficients:
+#                                   Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                       2.381297   0.977120   2.437  0.01510 * 
+# originAtenco                      1.402828   1.315408   1.066  0.28666   
+# originAtizapan de Zaragoza        0.247646   0.399445   0.620  0.53552   
+# originAzcapotzalco                0.618703   0.409910   1.509  0.13175   
+# originBenito Juarez               0.832470   0.614825   1.354  0.17626   
+# originChalco                      2.060671   0.861346   2.392  0.01705 * 
+# originChimalhuacï¿½ï¿½n     1.487914   1.520598   0.979  0.32823   
+# originChimalhuacan                1.402828   1.315408   1.066  0.28666   
+# originCoacalco de Berriozal       0.277673   0.588309   0.472  0.63711   
+# originCoyoacan                    1.067750   0.739269   1.444  0.14918   
+# originCuajimalpa de Morelos       1.402828   0.971370   1.444  0.14923   
+# originCuauhtemoc                  0.321402   0.556437   0.578  0.56375   
+# originCuauhtlmoc                  2.371107   1.316332   1.801  0.07217 . 
+# originCuautitlan                  0.062513   1.319923   0.047  0.96224   
+# originCuautitlan Izcalli          1.686095   0.994824   1.695  0.09063 . 
+# originEcatepec de Morelos         0.197109   0.463168   0.426  0.67058   
+# originGustavo A. Madero           0.235214   0.563522   0.417  0.67654   
+# originIztacalco                  -1.597172   0.971370  -1.644  0.10066   
+# originIztapalapa                  2.288776   0.826806   2.768  0.00582 **
+# originMagdalena Contreras         2.192064   1.353732   1.619  0.10593   
+# originMiguel Hidalgo              0.388954   0.573093   0.679  0.49760   
+# originNaucalpan de Juarez         0.937914   0.632279   1.483  0.13851   
+# originNextlalplan                -0.939329   1.338245  -0.702  0.48301   
+# originNezahualcoyotl             -0.642585   0.881439  -0.729  0.46628   
+# originNicolas Romero              0.634450   0.490447   1.294  0.19631   
+# originOtro                        1.325897   0.587923   2.255  0.02449 * 
+# originTecamec                     0.633317   0.473190   1.338  0.18129   
+# originTexcoco                    -0.438408   0.978665  -0.448  0.65434   
+# originTlalnepantla de Baz         0.328331   0.427249   0.768  0.44251   
+# originTlalpan                     0.902828   0.971370   0.929  0.35305   
+# originTultitlan                   0.785214   0.757491   1.037  0.30035   
+# originVenustiano Carranza         0.694594   0.837303   0.830  0.40713   
+# originZumpango                    1.062513   1.319923   0.805  0.42116   
+# destinationAtenco                -0.784125   1.990202  -0.394  0.69373   
+# destinationAtizapan de Zaragoza   0.215875   0.902196   0.239  0.81097   
+# destinationAzcapotzalco           0.556190   0.911312   0.610  0.54189   
+# destinationBenito Juarez         -0.336456   1.073487  -0.313  0.75407   
+# destinationChimalhuacan          -0.578405   1.564822  -0.370  0.71179   
+# destinationCoacalco de Berriozal -0.452612   1.006656  -0.450  0.65315   
+# destinationCocotitlan            -1.578405   1.564822  -1.009  0.31354   
+# destinationCoyoacan               0.290372   1.555409   0.187  0.85197   
+# destinationCuajimalpa de Morelos  1.994880   1.114904   1.789  0.07409 . 
+# destinationCuauhtemoc             0.309027   0.998531   0.309  0.75707   
+# destinationCuautitlan            -1.628943   1.548474  -1.052  0.29325   
+# destinationCuautitlan Izcalli    -0.332199   1.188105  -0.280  0.77988   
+# destinationEcatepec de Morelos   -0.441968   0.936790  -0.472  0.63725   
+# destinationGustavo A. Madero     -0.309620   1.070728  -0.289  0.77256   
+# destinationIztapalapa             1.000000   1.536298   0.651  0.51536   
+# destinationMiguel Hidalgo         0.666120   1.043074   0.639  0.52333   
+# destinationNaucalpan de Juarez    0.176664   0.977474   0.181  0.85664   
+# destinationNezahualcoyotl        -0.869211   1.182771  -0.735  0.46270   
+# destinationNicolas Romero        -0.573361   0.967629  -0.593  0.55372   
+# destinationOtro                  -0.186160   1.003785  -0.185  0.85293   
+# destinationTecamec               -0.001579   0.937264  -0.002  0.99866   
+# destinationTemamatla             -2.670073   1.458933  -1.830  0.06774 . 
+# destinationTizayuca               1.421595   1.564822   0.908  0.36400   
+# destinationTlalnepantla de Baz    0.247596   0.912481   0.271  0.78622   
+# destinationTlalpan                2.371057   1.548474   1.531  0.12626   
+# destinationTultitlan              1.371057   1.548474   0.885  0.37629   
+# destinationVenustiano Carranza    0.027675   1.160652   0.024  0.98099   
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Residual standard error: 1.254 on 585 degrees of freedom
+# Multiple R-squared:  0.1798,  Adjusted R-squared:  0.09711 
+# F-statistic: 2.174 on 59 and 585 DF,  p-value: 3.17e-06
+
 
 # Only perception variables
 
@@ -601,37 +673,69 @@ summaries = getModelMetrics("Perception variables",linear_model4, summaries, tra
 #     most_safe + least_safe, data = train)
 
 # Residuals:
-#      Min       1Q   Median       3Q      Max 
-# -2.54500 -0.94949  0.04758  0.75233  3.05051 
+#     Min      1Q  Median      3Q     Max 
+# -2.7510 -0.8983  0.0639  0.8704  3.2580 
 
 # Coefficients:
-#                    Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)         2.02445    1.16016   1.745 0.081450 .  
-# mode_security2      0.61195    0.16035   3.816 0.000148 ***
-# mode_security3      0.97555    0.11856   8.228  1.0e-15 ***
-# mode_security4      1.42279    0.13725  10.366  < 2e-16 ***
-# mode_security5      1.37518    0.19299   7.126  2.7e-12 ***
-# importance_safety1 -1.20002    1.24944  -0.960 0.337180    
-# importance_safety2 -1.25096    1.32083  -0.947 0.343931    
-# importance_safety3 -0.87664    1.23148  -0.712 0.476799    
-# importance_safety4 -0.46762    1.21704  -0.384 0.700934    
-# importance_safety5 -0.79388    1.21045  -0.656 0.512141    
-# most_safeBRT        0.58868    0.33668   1.748 0.080845 .  
-# most_safeMetro      0.56572    0.32755   1.727 0.084611 .  
-# most_safePeseros    0.62947    0.36706   1.715 0.086832 .  
-# most_safeTaxi       0.59311    0.33943   1.747 0.081040 .  
-# most_safeTrolebus   1.08362    0.37255   2.909 0.003751 ** 
-# least_safeBRT      -0.07938    0.43080  -0.184 0.853860    
-# least_safeMetro     0.27475    0.40853   0.673 0.501474    
-# least_safePeseros   0.15320    0.37181   0.412 0.680445    
-# least_safeTaxi      0.27024    0.38600   0.700 0.484114    
-# least_safeTrolebus  0.26218    0.43287   0.606 0.544937    
+#                     Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)         1.659411   0.482798   3.437 0.000627 ***
+# mode_security2      0.779690   0.172109   4.530 7.06e-06 ***
+# mode_security3      1.037814   0.127589   8.134 2.23e-15 ***
+# mode_security4      1.456673   0.150837   9.657  < 2e-16 ***
+# mode_security5      1.721050   0.202954   8.480  < 2e-16 ***
+# importance_safety2  0.076036   0.614164   0.124 0.901510    
+# importance_safety3  0.291793   0.466742   0.625 0.532086    
+# importance_safety4  0.449080   0.442021   1.016 0.310035    
+# importance_safety5  0.175661   0.411965   0.426 0.669965    
+# importance_safetyI  2.364184   1.275010   1.854 0.064173 .  
+# most_safeMetro     -0.008451   0.131015  -0.065 0.948587    
+# most_safePeseros   -0.090450   0.236986  -0.382 0.702838    
+# most_safeTaxi      -0.164775   0.160337  -1.028 0.304497    
+# most_safeTrolebus   0.247853   0.232310   1.067 0.286425    
+# least_safeMetro     0.256697   0.305610   0.840 0.401257    
+# least_safePeseros   0.071656   0.246980   0.290 0.771813    
+# least_safeTaxi     -0.052958   0.271399  -0.195 0.845354    
+# least_safeTrolebus  0.213335   0.362584   0.588 0.556493    
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.154 on 666 degrees of freedom
-# Multiple R-squared:  0.2097,	Adjusted R-squared:  0.1871 
-# F-statistic: 9.299 on 19 and 666 DF,  p-value: < 2.2e-16
+# Residual standard error: 1.203 on 627 degrees of freedom
+# Multiple R-squared:  0.1917,  Adjusted R-squared:  0.1697 
+# F-statistic: 8.744 on 17 and 627 DF,  p-value: < 2.2e-16
+
+# Only perception variables
+
+linear_model4a = lm(train$point_security~ +mode_security +importance_safety, data = train)
+summary(linear_model4a)
+summaries = getModelMetrics("Perception variables - relevant",linear_model4a, summaries, train, test)
+
+# Call:
+# lm(formula = train$point_security ~ +mode_security + importance_safety, 
+#     data = train)
+
+# Residuals:
+#      Min       1Q   Median       3Q      Max 
+# -2.59899 -0.87478  0.07675  1.04344  3.12522 
+
+# Coefficients:
+#                    Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)         1.71488    0.40983   4.184 3.26e-05 ***
+# mode_security2      0.77644    0.17128   4.533 6.94e-06 ***
+# mode_security3      1.04847    0.12568   8.342 4.55e-16 ***
+# mode_security4      1.46003    0.14711   9.925  < 2e-16 ***
+# mode_security5      1.72421    0.19714   8.746  < 2e-16 ***
+# importance_safety2  0.02312    0.60560   0.038    0.970    
+# importance_safety3  0.24168    0.45881   0.527    0.599    
+# importance_safety4  0.42522    0.43327   0.981    0.327    
+# importance_safety5  0.15991    0.40349   0.396    0.692    
+# importance_safetyI  2.23666    1.26705   1.765    0.078 .  
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Residual standard error: 1.2 on 635 degrees of freedom
+# Multiple R-squared:  0.1847,  Adjusted R-squared:  0.1731 
+# F-statistic: 15.98 on 9 and 635 DF,  p-value: < 2.2e-16
+
 
 #Only  instant contextual information
 linear_model5 = lm(train$point_security~ +haversine +urban_typology +total_passenger_count
@@ -646,45 +750,74 @@ summaries = getModelMetrics("Instant contextual information",linear_model5, summ
 
 # Residuals:
 #     Min      1Q  Median      3Q     Max 
-# -2.7444 -1.0317  0.1521  0.9661  2.9047 
+# -2.7142 -1.1428  0.1241  0.9798  2.7329 
 
 # Coefficients:
-#                         Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)            2.1073482  1.2747748   1.653 0.098785 .  
-# haversine             -0.0001917  0.0002944  -0.651 0.515015    
-# urban_typology1        1.1974795  0.3548987   3.374 0.000784 ***
-# urban_typology2        0.4006267  0.2296962   1.744 0.081599 .  
-# urban_typology3        0.6549039  0.3735016   1.753 0.079997 .  
-# urban_typology4        1.2111943  0.4510928   2.685 0.007436 ** 
-# urban_typology5        0.0494331  0.2401763   0.206 0.836995    
-# urban_typology6        0.5341091  0.2389423   2.235 0.025732 *  
-# urban_typology7        0.1599721  0.3360665   0.476 0.634223    
-# urban_typology9        0.2603907  0.2933263   0.888 0.375018    
-# total_passenger_count  0.0040604  0.0049804   0.815 0.415202    
-# total_female_count     0.0106283  0.0189837   0.560 0.575762    
-# empty_seats            0.0028120  0.0047517   0.592 0.554195    
-# hour7                  0.8714548  1.7639821   0.494 0.621452    
-# hour12                 0.5570743  1.2702622   0.439 0.661131    
-# hour13                 0.4964576  1.2577358   0.395 0.693175    
-# hour14                 0.4849624  1.2559390   0.386 0.699521    
-# hour15                 0.2710430  1.2735499   0.213 0.831530    
-# hour16                 0.5430102  1.2613921   0.430 0.666984    
-# hour17                 0.3196015  1.2569271   0.254 0.799365    
-# hour18                 0.1875036  1.2584401   0.149 0.881602    
-# hour19                 0.8144224  1.2796806   0.636 0.524720    
-# hour20                 3.1336444  1.7806084   1.760 0.078895 .  
-# week_day2              0.0287591  0.1874540   0.153 0.878115    
-# week_day3             -0.0556924  0.1942437  -0.287 0.774422    
-# week_day4             -0.0591611  0.1999702  -0.296 0.767438    
-# week_day5             -0.2464980  0.1904140  -1.295 0.195935    
-# week_day6              0.0787109  0.2002074   0.393 0.694339    
-# week_day7             -0.3664954  0.2050543  -1.787 0.074348 .  
+#                         Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)            4.0065846  1.3216420   3.032  0.00254 **
+# haversine             -0.0002549  0.0003018  -0.844  0.39874   
+# urban_typology1        0.8768780  0.3594168   2.440  0.01498 * 
+# urban_typology2        0.5625094  0.2397615   2.346  0.01929 * 
+# urban_typology3        0.8160782  0.4131167   1.975  0.04867 * 
+# urban_typology4        0.8700722  0.4877395   1.784  0.07493 . 
+# urban_typology5       -0.0457901  0.2537344  -0.180  0.85685   
+# urban_typology6        0.5059705  0.2503294   2.021  0.04369 * 
+# urban_typology7        0.2937721  0.3795157   0.774  0.43919   
+# urban_typology9        0.2687391  0.2939634   0.914  0.36097   
+# total_passenger_count  0.0034328  0.0055269   0.621  0.53476   
+# total_female_count    -0.0021647  0.0216472  -0.100  0.92038   
+# empty_seats            0.0016853  0.0053526   0.315  0.75298   
+# hour7                 -0.8888707  1.8345360  -0.485  0.62819   
+# hour12                -1.3622035  1.3199809  -1.032  0.30248   
+# hour13                -1.5799178  1.3061750  -1.210  0.22690   
+# hour14                -1.6047736  1.3050877  -1.230  0.21930   
+# hour15                -1.7387245  1.3244313  -1.313  0.18974   
+# hour16                -1.4441592  1.3109584  -1.102  0.27106   
+# hour17                -1.7824967  1.3062091  -1.365  0.17287   
+# hour18                -1.7574324  1.3081193  -1.343  0.17961   
+# hour19                -0.7359468  1.3361469  -0.551  0.58197   
+# week_day2              0.2607241  0.1938933   1.345  0.17922   
+# week_day3              0.1889647  0.2053683   0.920  0.35787   
+# week_day4              0.1469295  0.2122748   0.692  0.48909   
+# week_day5              0.0103530  0.2071330   0.050  0.96015   
+# week_day6              0.2911934  0.2027110   1.436  0.15137   
+# week_day7             -0.3019793  0.2125151  -1.421  0.15583   
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.229 on 657 degrees of freedom
-# Multiple R-squared:  0.116,	Adjusted R-squared:  0.07831 
-# F-statistic: 3.079 on 28 and 657 DF,  p-value: 2.74e-07
+# Residual standard error: 1.275 on 617 degrees of freedom
+# Multiple R-squared:  0.1063,  Adjusted R-squared:  0.06718 
+# F-statistic: 2.718 on 27 and 617 DF,  p-value: 8.852e-06
+
+#Only  instant contextual information
+linear_model5a = lm(train$point_security~ +urban_typology, data = train)
+summary(linear_model5a)
+summaries = getModelMetrics("Instant contextual information - relevant",linear_model5a, summaries, train, test)
+
+# Call:
+# lm(formula = train$point_security ~ +urban_typology, data = train)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -2.4118 -1.2990  0.1257  1.1206  2.7010 
+
+# Coefficients:
+#                 Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)      2.30952    0.19804  11.662  < 2e-16 ***
+# urban_typology1  1.10224    0.25188   4.376 1.41e-05 ***
+# urban_typology2  0.56482    0.21873   2.582  0.01004 *  
+# urban_typology3  1.09957    0.33778   3.255  0.00119 ** 
+# urban_typology4  1.09048    0.45160   2.415  0.01603 *  
+# urban_typology5 -0.01055    0.23707  -0.045  0.96450    
+# urban_typology6  0.56991    0.22562   2.526  0.01178 *  
+# urban_typology7  0.35714    0.36157   0.988  0.32365    
+# urban_typology9  0.36905    0.26198   1.409  0.15942    
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Residual standard error: 1.283 on 636 degrees of freedom
+# Multiple R-squared:  0.06652, Adjusted R-squared:  0.05478 
+# F-statistic: 5.665 on 8 and 636 DF,  p-value: 5.726e-07
 
 # Only sociodemographic data
 linear_model6 = lm(train$point_security~ +age +gender +education, data = train)
@@ -697,29 +830,27 @@ summaries = getModelMetrics("Sociodemographic data",linear_model6, summaries, tr
 
 # Residuals:
 #     Min      1Q  Median      3Q     Max 
-# -2.1679 -0.9911  0.1380  1.0963  2.6736 
+# -1.9927 -1.1553  0.1364  1.1364  2.7081 
 
 # Coefficients:
 #                               Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                    2.52808    0.36019   7.019 5.48e-12 ***
-# age0-17                        0.63980    0.66053   0.969    0.333    
-# age18-24                       0.70321    0.64697   1.087    0.277    
-# age25-44                       0.70992    0.64728   1.097    0.273    
-# age45-64                       0.50461    0.65440   0.771    0.441    
-# age65+                         0.54439    0.69437   0.784    0.433    
-# gendermale                     0.13244    0.09938   1.333    0.183    
-# educationLicenciatura         -0.46671    0.58918  -0.792    0.429    
-# educationMaestria y Doctorado -0.83285    0.72253  -1.153    0.249    
-# educationPreparatoria         -0.37262    0.58460  -0.637    0.524    
-# educationPrimaria             -0.42186    0.61125  -0.690    0.490    
-# educationSecundaria           -0.39475    0.58612  -0.673    0.501    
-# educationSin estudios         -0.70630    0.76124  -0.928    0.354    
+# (Intercept)                    2.63036    0.22309  11.790   <2e-16 ***
+# age18-24                       0.07986    0.21684   0.368    0.713    
+# age25-44                       0.12916    0.20681   0.625    0.533    
+# age45-64                      -0.10663    0.22341  -0.477    0.633    
+# age65+                         0.03000    0.33292   0.090    0.928    
+# gendermale                     0.08985    0.10560   0.851    0.395    
+# educationMaestria y Doctorado  0.75450    0.66946   1.127    0.260    
+# educationPreparatoria          0.14337    0.13183   1.087    0.277    
+# educationPrimaria             -0.09788    0.23224  -0.421    0.674    
+# educationSecundaria            0.13115    0.15255   0.860    0.390    
+# educationSin estudios         -0.45832    0.48814  -0.939    0.348    
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.283 on 673 degrees of freedom
-# Multiple R-squared:  0.01225,	Adjusted R-squared:  -0.005363 
-# F-statistic: 0.6955 on 12 and 673 DF,  p-value: 0.7567
+# Residual standard error: 1.321 on 634 degrees of freedom
+# Multiple R-squared:  0.01446, Adjusted R-squared:  -0.001085 
+# F-statistic: 0.9302 on 10 and 634 DF,  p-value: 0.5046
 
 # Only personal trip information
 linear_model7 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
@@ -731,93 +862,164 @@ summaries = getModelMetrics("Personal trip information",linear_model7, summaries
 #     trip_purpose, data = train)
 
 # Residuals:
-#      Min       1Q   Median       3Q      Max 
-# -2.64649 -1.05939  0.05793  0.78433  2.84390 
+#     Min      1Q  Median      3Q     Max 
+# -2.9250 -1.0278  0.0000  0.8448  2.9722 
 
-# Coefficients: (1 not defined because of singularities)
-#                                    Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                        2.640083   0.422911   6.243 8.03e-10 ***
-# originAcolman                     -1.122587   1.406023  -0.798  0.42494    
-# originAlvaro Obregon              -1.528978   0.989054  -1.546  0.12264    
-# originAtenco                      -0.666260   1.400353  -0.476  0.63440    
-# originAtizapan de Zaragoza        -1.715412   0.906295  -1.893  0.05886 .  
-# originAzcapotzalco                -1.452473   0.909727  -1.597  0.11087    
-# originBenito Juarez               -1.056001   0.998062  -1.058  0.29045    
-# originChimalhuacï¿½ï¿½n     -0.780358   1.645876  -0.474  0.63558    
-# originCoacalco de Berriozal       -1.563134   0.988300  -1.582  0.11425    
-# originCoyoacan                    -2.105880   1.246498  -1.689  0.09164 .  
-# originCuajimalpa de Morelos       -0.747200   1.528449  -0.489  0.62511    
-# originCuauhtemoc                  -1.890462   0.963912  -1.961  0.05030 .  
-# originCuauhtlmoc                   0.488137   1.530605   0.319  0.74990    
-# originCuautitlan                  -2.031709   1.533796  -1.325  0.18579    
-# originCuautitlan Izcalli           0.300633   1.298375   0.232  0.81697    
-# originEcatepec de Morelos         -1.695531   0.931492  -1.820  0.06921 .  
-# originGustavo A. Madero           -1.362023   0.977434  -1.393  0.16398    
-# originIxtapaluca                  -1.529380   1.523665  -1.004  0.31589    
-# originIztacalco                   -3.706179   1.266553  -2.926  0.00356 ** 
-# originIztapalapa                   0.238311   1.155476   0.206  0.83667    
-# originMagdalena Contreras         -0.005112   1.555441  -0.003  0.99738    
-# originMiguel Hidalgo              -1.537718   1.008270  -1.525  0.12775    
-# originNaucalpan de Juarez         -1.363759   1.012280  -1.347  0.17841    
-# originNextlalplan                 -2.851635   1.539693  -1.852  0.06449 .  
-# originNezahualcoyotl              -2.233500   1.543253  -1.447  0.14833    
-# originNicolas Romero              -1.686004   0.948339  -1.778  0.07592 .  
-# originOtro                        -1.206654   1.015882  -1.188  0.23538    
-# originTecamec                     -1.286903   0.935724  -1.375  0.16954    
-# originTexcoco                     -2.589459   1.263329  -2.050  0.04082 *  
-# originTiahuac                     -1.357259   1.401099  -0.969  0.33307    
-# originTlalnepantla de Baz         -1.354082   0.914202  -1.481  0.13908    
-# originTlalpan                     -1.147916   1.257449  -0.913  0.36166    
-# originTultitlan                   -0.853119   1.032342  -0.826  0.40890    
-# originVenustiano Carranza         -1.050430   1.268473  -0.828  0.40793    
-# originZumpango                    -1.718201   1.589868  -1.081  0.28025    
-# destinationAlvaro Obregon          0.970280   1.443401   0.672  0.50170    
-# destinationAtenco                  0.006085   1.683355   0.004  0.99712    
-# destinationAtizapan de Zaragoza    1.409192   1.131746   1.245  0.21355    
-# destinationAzcapotzalco            1.501920   1.113557   1.349  0.17791    
-# destinationBenito Juarez           1.094869   1.257730   0.871  0.38436    
-# destinationChimalhuacan            0.515071   1.681965   0.306  0.75953    
-# destinationCoacalco de Berriozal   0.477741   1.186463   0.403  0.68734    
-# destinationCoyoacan                1.220653   1.422242   0.858  0.39108    
-# destinationCuajimalpa de Morelos   2.942860   1.304782   2.255  0.02446 *  
-# destinationCuauhtemoc              0.641215   1.222402   0.525  0.60008    
-# destinationCuautitlan              0.478702   1.434584   0.334  0.73873    
-# destinationCuautitlan Izcalli      1.534952   1.665674   0.922  0.35714    
-# destinationEcatepec de Morelos     0.671175   1.148941   0.584  0.55932    
-# destinationGustavo A. Madero       0.852780   1.238375   0.689  0.49132    
-# destinationIztacalco              -0.641847   1.662802  -0.386  0.69963    
-# destinationIztapalapa              2.272013   1.674271   1.357  0.17527    
-# destinationMiguel Hidalgo          1.828052   1.209234   1.512  0.13111    
-# destinationNaucalpan de Juarez     1.316209   1.129418   1.165  0.24431    
-# destinationNezahualcoyotl          0.131793   1.273954   0.103  0.91764    
-# destinationNicolas Romero          0.824652   1.170329   0.705  0.48131    
-# destinationOtro                    1.330747   1.205780   1.104  0.27018    
-# destinationTecamec                 0.895493   1.151453   0.778  0.43704    
-# destinationTemamatla              -1.576318   1.599260  -0.986  0.32469    
-# destinationTeotihuacï¿½ï¿½n        NA         NA      NA       NA    
-# destinationTizayuca                2.338272   1.680509   1.391  0.16461    
-# destinationTlalnepantla de Baz     1.331403   1.139590   1.168  0.24313    
-# destinationTlalpan                 2.800899   1.422449   1.969  0.04939 *  
-# destinationTultitlan               0.857705   1.436084   0.597  0.55056    
-# destinationVenustiano Carranza     1.015615   1.330763   0.763  0.44565    
-# companions1 to 2                  -0.361395   0.569563  -0.635  0.52598    
-# companions3 to 4                  -0.419899   0.595327  -0.705  0.48088    
-# companionsMas                     -0.583242   0.717135  -0.813  0.41637    
-# companionsNone                    -0.301123   0.561214  -0.537  0.59177    
-# trip_purposeCompra                 1.108767   0.661638   1.676  0.09429 .  
-# trip_purposeEstudio                1.309605   0.668854   1.958  0.05068 .  
-# trip_purposeOtro                   1.059320   0.653803   1.620  0.10569    
-# trip_purposeRecreacion             1.018299   0.660156   1.543  0.12346    
-# trip_purposeTrabajo                0.841500   0.644516   1.306  0.19217    
+# Coefficients:
+#                                   Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                       2.611822   0.980897   2.663  0.00797 **
+# originAtenco                      0.881880   1.334245   0.661  0.50890   
+# originAtizapan de Zaragoza        0.178951   0.402545   0.445  0.65681   
+# originAzcapotzalco                0.507278   0.413073   1.228  0.21993   
+# originBenito Juarez               0.776108   0.617109   1.258  0.20903   
+# originChalco                      2.093300   0.863850   2.423  0.01569 * 
+# originChimalhuacï¿½ï¿½n     1.053309   1.533971   0.687  0.49258   
+# originChimalhuacan                1.117159   1.322921   0.844  0.39876   
+# originCoacalco de Berriozal       0.234221   0.595043   0.394  0.69401   
+# originCoyoacan                    0.986337   0.745096   1.324  0.18610   
+# originCuajimalpa de Morelos       1.228008   0.983115   1.249  0.21213   
+# originCuauhtemoc                  0.173926   0.562196   0.309  0.75715   
+# originCuauhtlmoc                  2.386781   1.317742   1.811  0.07062 . 
+# originCuautitlan                 -0.428701   1.346560  -0.318  0.75032   
+# originCuautitlan Izcalli          1.670535   0.994937   1.679  0.09369 . 
+# originEcatepec de Morelos         0.145352   0.466227   0.312  0.75533   
+# originGustavo A. Madero           0.171865   0.566031   0.304  0.76152   
+# originIztacalco                  -1.673964   0.985028  -1.699  0.08978 . 
+# originIztapalapa                  2.142445   0.830062   2.581  0.01009 * 
+# originMagdalena Contreras         2.197924   1.353649   1.624  0.10498   
+# originMiguel Hidalgo              0.353976   0.576227   0.614  0.53926   
+# originNaucalpan de Juarez         0.724791   0.641771   1.129  0.25921   
+# originNextlalplan                -0.882501   1.338698  -0.659  0.51002   
+# originNezahualcoyotl             -0.691868   0.889433  -0.778  0.43696   
+# originNicolas Romero              0.579448   0.493014   1.175  0.24035   
+# originOtro                        1.227535   0.591691   2.075  0.03846 * 
+# originTecamec                     0.566570   0.475659   1.191  0.23409   
+# originTexcoco                    -0.625663   0.986717  -0.634  0.52628   
+# originTlalnepantla de Baz         0.239641   0.431327   0.556  0.57871   
+# originTlalpan                     0.876996   0.974301   0.900  0.36843   
+# originTultitlan                   0.675264   0.762397   0.886  0.37614   
+# originVenustiano Carranza         0.673116   0.839896   0.801  0.42321   
+# originZumpango                    1.104653   1.328464   0.832  0.40602   
+# destinationAtenco                -0.510302   2.021175  -0.252  0.80076   
+# destinationAtizapan de Zaragoza   0.271019   0.907153   0.299  0.76523   
+# destinationAzcapotzalco           0.565001   0.915242   0.617  0.53726   
+# destinationBenito Juarez         -0.217462   1.079339  -0.201  0.84040   
+# destinationChimalhuacan          -0.446377   1.568585  -0.285  0.77607   
+# destinationCoacalco de Berriozal -0.476367   1.012370  -0.471  0.63814   
+# destinationCocotitlan            -1.446377   1.568585  -0.922  0.35687   
+# destinationCoyoacan               0.221136   1.561107   0.142  0.88740   
+# destinationCuajimalpa de Morelos  2.013941   1.125304   1.790  0.07403 . 
+# destinationCuauhtemoc             0.389961   1.009321   0.386  0.69937   
+# destinationCuautitlan            -0.877095   1.649447  -0.532  0.59510   
+# destinationCuautitlan Izcalli    -0.092341   1.206156  -0.077  0.93900   
+# destinationEcatepec de Morelos   -0.418524   0.941456  -0.445  0.65681   
+# destinationGustavo A. Madero     -0.412855   1.072420  -0.385  0.70040   
+# destinationIztapalapa             1.191698   1.539804   0.774  0.43929   
+# destinationMiguel Hidalgo         0.824194   1.049322   0.785  0.43251   
+# destinationNaucalpan de Juarez    0.278143   0.984933   0.282  0.77774   
+# destinationNezahualcoyotl        -0.827811   1.185878  -0.698  0.48542   
+# destinationNicolas Romero        -0.498948   0.971875  -0.513  0.60788   
+# destinationOtro                  -0.067092   1.008852  -0.067  0.94700   
+# destinationTecamec               -0.004186   0.942987  -0.004  0.99646   
+# destinationTemamatla             -2.643419   1.465154  -1.804  0.07172 . 
+# destinationTizayuca               1.524302   1.578632   0.966  0.33466   
+# destinationTlalnepantla de Baz    0.312194   0.917711   0.340  0.73384   
+# destinationTlalpan                2.046547   1.566511   1.306  0.19192   
+# destinationTultitlan              1.490703   1.560220   0.955  0.33975   
+# destinationVenustiano Carranza    0.167887   1.167855   0.144  0.88574   
+# companions3 to 4                  0.016600   0.237972   0.070  0.94441   
+# companionsMas                    -0.704801   0.551077  -1.279  0.20143   
+# companionsNone                   -0.072599   0.121991  -0.595  0.55200   
+# trip_purposeEstudio               0.235279   0.245394   0.959  0.33807   
+# trip_purposeOtro                 -0.110849   0.184496  -0.601  0.54820   
+# trip_purposeRecreacion           -0.208877   0.201985  -1.034  0.30151   
+# trip_purposeTrabajo              -0.238199   0.169932  -1.402  0.16153   
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-# Residual standard error: 1.225 on 614 degrees of freedom
-# Multiple R-squared:  0.1793,	Adjusted R-squared:  0.08438 
-# F-statistic: 1.889 on 71 and 614 DF,  p-value: 4.017e-05
+# Residual standard error: 1.253 on 578 degrees of freedom
+# Multiple R-squared:  0.1919,  Adjusted R-squared:  0.09965 
+# F-statistic:  2.08 on 66 and 578 DF,  p-value: 4.667e-06
 
+linear_model7a = lm(train$point_security~ +origin +destination, data = train)
+summary(linear_model7a)
+summaries = getModelMetrics("Personal trip information - relevant",linear_model7a, summaries, train, test)
 
+# Call:
+# lm(formula = train$point_security ~ +origin + destination, data = train)
 
+# Residuals:
+#      Min       1Q   Median       3Q      Max 
+# -3.00524 -1.13644  0.04278  0.86356  2.86356 
+
+# Coefficients:
+#                                   Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                       2.381297   0.977120   2.437  0.01510 * 
+# originAtenco                      1.402828   1.315408   1.066  0.28666   
+# originAtizapan de Zaragoza        0.247646   0.399445   0.620  0.53552   
+# originAzcapotzalco                0.618703   0.409910   1.509  0.13175   
+# originBenito Juarez               0.832470   0.614825   1.354  0.17626   
+# originChalco                      2.060671   0.861346   2.392  0.01705 * 
+# originChimalhuacï¿½ï¿½n     1.487914   1.520598   0.979  0.32823   
+# originChimalhuacan                1.402828   1.315408   1.066  0.28666   
+# originCoacalco de Berriozal       0.277673   0.588309   0.472  0.63711   
+# originCoyoacan                    1.067750   0.739269   1.444  0.14918   
+# originCuajimalpa de Morelos       1.402828   0.971370   1.444  0.14923   
+# originCuauhtemoc                  0.321402   0.556437   0.578  0.56375   
+# originCuauhtlmoc                  2.371107   1.316332   1.801  0.07217 . 
+# originCuautitlan                  0.062513   1.319923   0.047  0.96224   
+# originCuautitlan Izcalli          1.686095   0.994824   1.695  0.09063 . 
+# originEcatepec de Morelos         0.197109   0.463168   0.426  0.67058   
+# originGustavo A. Madero           0.235214   0.563522   0.417  0.67654   
+# originIztacalco                  -1.597172   0.971370  -1.644  0.10066   
+# originIztapalapa                  2.288776   0.826806   2.768  0.00582 **
+# originMagdalena Contreras         2.192064   1.353732   1.619  0.10593   
+# originMiguel Hidalgo              0.388954   0.573093   0.679  0.49760   
+# originNaucalpan de Juarez         0.937914   0.632279   1.483  0.13851   
+# originNextlalplan                -0.939329   1.338245  -0.702  0.48301   
+# originNezahualcoyotl             -0.642585   0.881439  -0.729  0.46628   
+# originNicolas Romero              0.634450   0.490447   1.294  0.19631   
+# originOtro                        1.325897   0.587923   2.255  0.02449 * 
+# originTecamec                     0.633317   0.473190   1.338  0.18129   
+# originTexcoco                    -0.438408   0.978665  -0.448  0.65434   
+# originTlalnepantla de Baz         0.328331   0.427249   0.768  0.44251   
+# originTlalpan                     0.902828   0.971370   0.929  0.35305   
+# originTultitlan                   0.785214   0.757491   1.037  0.30035   
+# originVenustiano Carranza         0.694594   0.837303   0.830  0.40713   
+# originZumpango                    1.062513   1.319923   0.805  0.42116   
+# destinationAtenco                -0.784125   1.990202  -0.394  0.69373   
+# destinationAtizapan de Zaragoza   0.215875   0.902196   0.239  0.81097   
+# destinationAzcapotzalco           0.556190   0.911312   0.610  0.54189   
+# destinationBenito Juarez         -0.336456   1.073487  -0.313  0.75407   
+# destinationChimalhuacan          -0.578405   1.564822  -0.370  0.71179   
+# destinationCoacalco de Berriozal -0.452612   1.006656  -0.450  0.65315   
+# destinationCocotitlan            -1.578405   1.564822  -1.009  0.31354   
+# destinationCoyoacan               0.290372   1.555409   0.187  0.85197   
+# destinationCuajimalpa de Morelos  1.994880   1.114904   1.789  0.07409 . 
+# destinationCuauhtemoc             0.309027   0.998531   0.309  0.75707   
+# destinationCuautitlan            -1.628943   1.548474  -1.052  0.29325   
+# destinationCuautitlan Izcalli    -0.332199   1.188105  -0.280  0.77988   
+# destinationEcatepec de Morelos   -0.441968   0.936790  -0.472  0.63725   
+# destinationGustavo A. Madero     -0.309620   1.070728  -0.289  0.77256   
+# destinationIztapalapa             1.000000   1.536298   0.651  0.51536   
+# destinationMiguel Hidalgo         0.666120   1.043074   0.639  0.52333   
+# destinationNaucalpan de Juarez    0.176664   0.977474   0.181  0.85664   
+# destinationNezahualcoyotl        -0.869211   1.182771  -0.735  0.46270   
+# destinationNicolas Romero        -0.573361   0.967629  -0.593  0.55372   
+# destinationOtro                  -0.186160   1.003785  -0.185  0.85293   
+# destinationTecamec               -0.001579   0.937264  -0.002  0.99866   
+# destinationTemamatla             -2.670073   1.458933  -1.830  0.06774 . 
+# destinationTizayuca               1.421595   1.564822   0.908  0.36400   
+# destinationTlalnepantla de Baz    0.247596   0.912481   0.271  0.78622   
+# destinationTlalpan                2.371057   1.548474   1.531  0.12626   
+# destinationTultitlan              1.371057   1.548474   0.885  0.37629   
+# destinationVenustiano Carranza    0.027675   1.160652   0.024  0.98099   
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+# Residual standard error: 1.254 on 585 degrees of freedom
+# Multiple R-squared:  0.1798,  Adjusted R-squared:  0.09711 
+# F-statistic: 2.174 on 59 and 585 DF,  p-value: 3.17e-06
 
 library(rpart)
 library(rpart.plot)
