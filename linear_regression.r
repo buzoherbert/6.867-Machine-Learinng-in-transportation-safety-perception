@@ -11,7 +11,20 @@ library(magrittr)
 # For knn model
 library("class")
 
-# loading file
+# loading files
+files_number = 5
+
+plot_data_tables = list()
+for (i in 0:(files_number-1)) {
+  file_name = "final_data_"
+  file_name = paste(file_name, i, sep="")
+  file_name = paste(file_name, ".csv", sep="")
+  plot_data_tables[[i+1]] <- read.table(file=file_name, header = TRUE, na.strings=c("", "NA"), sep=",")
+}
+
+
+
+
 plot_data <- read.table(file="safety_data_clean.csv", header = TRUE, na.strings=c("", "NA"), sep=",")
 
 # Making sure variables are treated properly
