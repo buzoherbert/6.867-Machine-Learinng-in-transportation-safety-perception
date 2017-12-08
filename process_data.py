@@ -60,8 +60,8 @@ class Data:
     def process_data(self, titles, data):
         #split train val test
         n = len(data)
-        test_no = int(n*self.test_ratio)
-        val_no = int(n*self.val_ratio)
+        test_no = math.ceil(n*self.test_ratio)
+        val_no = math.ceil(n*self.val_ratio)
         train = data[:n-test_no-val_no]
         val = data[n-test_no-val_no:n-test_no]
         test = data[n-test_no:]
