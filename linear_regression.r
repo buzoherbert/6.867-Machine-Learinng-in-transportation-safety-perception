@@ -11,77 +11,39 @@ library(magrittr)
 # For knn model
 library("class")
 
-# loading files
-files_number = 5
-
-plot_data_tables = list()
-for (i in 0:(files_number-1)) {
-  file_name = "final_data_"
-  file_name = paste(file_name, i, sep="")
-  file_name = paste(file_name, ".csv", sep="")
-  plot_data_tables[[i+1]] <- read.table(file=file_name, header = TRUE, na.strings=c("", "NA"), sep=",")
+interpret_variables <- function(data_frame){
+  # Remove unused
+  data_frame[["X"]] = NULL
+  data_frame[["latitude"]] = NULL
+  data_frame[["longitude"]] = NULL
+  
+  
+  # Making sure variables are treated properly
+  for(i in names(data_frame)){
+    if(i == "total_female_count"){
+      data_frame[["total_female_count"]] = as.numeric(as.character(data_frame[["total_female_count"]]))
+    } else if(i == "total_passenger_count"){
+      data_frame[["total_passenger_count"]] = as.numeric(as.character(data_frame[["total_passenger_count"]]))
+    } else if(i == "empty_seats") {
+      data_frame[["empty_seats"]] = as.numeric(as.character(data_frame[["empty_seats"]]))
+    } else if(i == "point_security") {
+      data_frame[["point_security"]] = as.numeric(as.character(data_frame[["point_security"]]))
+    } else if(i == "mode_security") {
+      data_frame[["mode_security"]] = as.numeric(as.character(data_frame[["mode_security"]]))
+    } else if(i == "importance_safety") {
+      data_frame[["importance_safety"]] = as.numeric(as.character(data_frame[["importance_safety"]]))
+    } else if(i == "haversine") {
+      data_frame[["haversine"]] = as.numeric(as.character(data_frame[["haversine"]]))      
+    } else if(i == "hour_sin") {
+      data_frame[["hour_sin"]] = as.numeric(as.character(data_frame[["hour_sin"]]))      
+    } else if(i == "hour_cos") {
+      data_frame[["hour_cos"]] = as.numeric(as.character(data_frame[["hour_cos"]]))      
+    }else {
+      data_frame[[i]] <- as.factor(data_frame[[i]])
+    } 
+  }
+  return(data_frame)
 }
-
-
-
-
-plot_data <- read.table(file="safety_data_clean.csv", header = TRUE, na.strings=c("", "NA"), sep=",")
-
-# Making sure variables are treated properly
-for(i in names(plot_data)){
-  if(i == "total_female_count"){
-    print(i)
-    plot_data[["total_female_count"]] = as.numeric(as.character(plot_data[["total_female_count"]]))
-  } else if(i == "total_passenger_count"){
-    print(i)
-    plot_data[["total_passenger_count"]] = as.numeric(as.character(plot_data[["total_passenger_count"]]))
-  } else if(i == "empty_seats") {
-    print(i)
-    plot_data[["empty_seats"]] = as.numeric(as.character(plot_data[["empty_seats"]]))
-  } else if(i == "point_security") {
-    print(i)
-    plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
-  } else if(i == "haversine") {
-    print(i)
-    plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]])      
-  } else {
-    print("default")
-    plot_data[[i]] <- as.factor(plot_data[[i]])
-  } 
-}
-
-# Some fields have to be treated as numeric.
-# TODO improve this so we don't convert the data twice.
-plot_data[["total_female_count"]] = as.numeric(as.character(plot_data[["total_female_count"]]))
-plot_data[["total_passenger_count"]] = as.numeric(as.character(plot_data[["total_passenger_count"]]))
-plot_data[["empty_seats"]] = as.numeric(as.character(plot_data[["empty_seats"]]))
-plot_data[["point_security"]] = as.numeric(as.character(plot_data[["point_security"]]))
-plot_data[["haversine"]] = as.numeric(plot_data[["haversine"]])
-
-
-# Getting a summary of the data
-# summary(plot_data)
-
-# plotting the data
-#to_plot = plot_data
-#to_plot$point_security = as.factor(to_plot$point_security)
-#ggpairs(to_plot, mapping = aes(color = point_security))
-
-########################
-## Creating train and testing sets
-## 70% of the sample size
-smp_size <- floor(0.7 * nrow(plot_data))
-## set the seed to make your partition reproductible
-set.seed(888)
-train_ind <- sample(seq_len(nrow(plot_data)), size = smp_size)
-
-train <- plot_data[train_ind, ]
-test <- plot_data[-train_ind, ]
-
-train = subset(train, select = -c(X))
-test = subset(test, select = -c(X))
-
-
 
 # Removing categories not on the training set
 # Residual standard error: 1.092 on 550 degrees of freedom
@@ -175,6 +137,7 @@ remove_missing_levels <- function(fit, test_data) {
   return(test_data)
 }
 
+
 # Function to get the metrics of each model and add it to the summaries table
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
@@ -209,6 +172,53 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   
   return(summaries_table)
 }
+
+
+
+# loading files
+files_number = 5
+
+data_tables = list()
+data_test = list()
+data_train = list()
+models = list()
+summaries = NULL
+for (i in 1:(files_number)) {
+  file_name = "final_data_"
+  file_name = paste(file_name, i-1, sep="")
+  file_name = paste(file_name, ".csv", sep="")
+  data_tables[[i]] <- read.table(file=file_name, header = TRUE, na.strings=c("", "NA"), sep=",")
+  data_tables[[i]] <- interpret_variables(data_tables[[i]])
+  
+  # Dividing the datasets
+  train_smp_size <- floor(0.6 * nrow(data_tables[[i]]))
+  data_train[[i]] <- data_tables[[i]][1:(train_smp_size-1),]
+  data_test[[i]] <- data_tables[[i]][(train_smp_size):nrow(data_tables[[i]]),]
+  
+  
+  ########################
+  ## Linear regression model with all the variables
+  models[[i]] = lm(data_train[[i]]$point_security ~., data = data_train[[i]])
+  summary(models[[i]])
+  model_name = paste("Initial model ", i, sep="")
+  summaries = getModelMetrics(model_name ,models[[i]], summaries, data_train[[i]], data_test[[i]])
+  
+  sig_variables = row.names(data.frame(summary(models[[i]])$coef[summary(models[[i]])$coef[,4] <= .1, 4]))
+  
+  
+  model_info = paste("data_train[[i]]$point_security ~",sig_variables, sep="")
+  models[[i]] = lm(model_info, data = data_train[[i]])
+  model_name = paste("Only relevant variables ", i, sep="")
+  summaries = getModelMetrics(model_name ,models[[i]], summaries, data_train[[i]], data_test[[i]])
+  #sig_variables_list = as.vector(sig_variables$Symbol)
+  
+  
+}
+
+
+
+
+
 
 
 ########################
