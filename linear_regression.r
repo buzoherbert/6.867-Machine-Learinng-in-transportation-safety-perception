@@ -191,10 +191,6 @@ cleanSignificantVariables <- function(original_list, list_to_clean) {
 getPredictionVector <- function(model, test_data){
   test_data = na.omit(remove_missing_levels (fit=model, test_data=test_data))
   pred_data = predict(model, newdata = test_data)
-  print("new")
-  print(nrow(test_data))
-  print(length(pred_data))
-
   return(pred_data)
 }
 
@@ -209,6 +205,22 @@ getFactorVectorFromFloat <- function(data){
     data[[i]] = round(data[[i]])
   }
   return(lapply(data, as.integer))
+}
+
+getConfusionMatrix <- function(pred, test, model){
+  predicted = as.factor(unlist(pred, use.names=FALSE))
+  real = as.factor(na.omit(
+    remove_missing_levels(fit=model, test_data=test))$point_security)
+  
+  real <- ordered(real, levels = c("1","2","3","4","5"))
+  predicted <- ordered(predicted, levels = c("1","2","3","4","5"))
+  
+  u = union(predicted, real)
+  conf = table(factor(predicted, u), factor(real, u))
+  print(conf)
+  
+  confusion_matrix = confusionMatrix(conf)
+  return(confusion_matrix)
 }
 
 
@@ -229,6 +241,8 @@ predictions_sig = list()
 cat_pred = list()
 cat_pred_sig = list()
 
+conf_mat = list()
+conf_mat_sig = list()
 
 # Variable lists
 
@@ -310,19 +324,16 @@ for(i in 1:(length(model_names))){
       cat_pred[[i]] = list()
       predictions_sig[[i]] = list()
       cat_pred_sig[[i]] = list()
+      conf_mat[[i]] = list()
+      conf_mat_sig[[i]] = list()
     }
     predictions[[i]][[j]] = getPredictionVector(models[[i]][[j]], data_test[[j]])
     cat_pred[[i]][[j]] = getFactorVectorFromFloat(predictions[[i]][[j]])
+    
     predictions_sig[[i]][[j]] = getPredictionVector(models_significant[[i]][[j]], data_test[[j]])
     cat_pred_sig[[i]][[j]] = getFactorVectorFromFloat(predictions_sig[[i]][[j]])
     
-    
-    
-    
-    predicted = as.factor(unlist(cat_pred[[i]][[j]], use.names=FALSE))
-    real = as.factor(na.omit(
-      remove_missing_levels(fit=models[[i]][[j]], test_data=data_test[[j]]))$point_security)
-    conf <- table(predicted, real)
-    confusion_matrix = confusionMatrix(conf)
+    conf_mat[[i]][[j]] = getConfusionMatrix(cat_pred[[i]][[j]], data_test[[j]], models[[i]][[j]])
+    conf_mat_sig[[i]][[j]] = getConfusionMatrix(cat_pred_sig[[i]][[j]], data_test[[j]], models_significant[[i]][[j]])
   }
 }
