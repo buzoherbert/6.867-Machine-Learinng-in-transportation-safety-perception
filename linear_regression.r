@@ -1,6 +1,7 @@
 install.packages("caTools", dependencies = TRUE)
 install.packages("magrittr")
-install.packages("class")
+install.packages("caret")
+install.packages('e1071', dependencies=TRUE)
 
 # For sample splitting
 library("caTools")
@@ -8,8 +9,9 @@ library("caTools")
 # For removing unused levels in test data
 library(magrittr)
 
-# For knn model
-library("class")
+# For confusion matrices
+library("caret")
+library("e1071")
 
 interpret_variables <- function(data_frame){
   # Remove unused
@@ -142,8 +144,6 @@ remove_missing_levels <- function(fit, test_data) {
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
 getModelMetrics <- function(model_name, linear_model, summaries_table, train_data, test_data) {
-  test_data = na.omit(remove_missing_levels (fit=linear_model, test_data=test_data))
-  
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
     summaries_table <- data.frame(matrix(ncol = 9, nrow = 0))
@@ -151,7 +151,7 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
     colnames(summaries_table) <- names
   }
   
-  pred_data = predict(linear_model, newdata = test_data)
+  pred_data = getPredictionVector(linear_model, test_data)
   SSE = sum((pred_data - test_data$point_security)^2)
   pred_mean = mean(train_data$point_security)
   SST = sum((pred_mean - test_data$point_security)^2)
@@ -175,6 +175,8 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
 
 
 cleanSignificantVariables <- function(original_list, list_to_clean) {
+  # Removing intercept from list
+  list_to_clean = list_to_clean[list_to_clean != "(Intercept)"]
   for(i in 1:(length(list_to_clean))){
     for(j in 1:(length(original_list))){
       if(grepl(original_list[[j]], list_to_clean[[i]])){
@@ -186,8 +188,32 @@ cleanSignificantVariables <- function(original_list, list_to_clean) {
 }
 
 
+getPredictionVector <- function(model, test_data){
+  test_data = na.omit(remove_missing_levels (fit=model, test_data=test_data))
+  pred_data = predict(model, newdata = test_data)
+  print("new")
+  print(nrow(test_data))
+  print(length(pred_data))
+
+  return(pred_data)
+}
+
+getFactorVectorFromFloat <- function(data){
+  for(i in 1:(length(data))){
+    if(data[[i]] > 5){
+      data[[i]] <- 5
+    }
+    if(data[[i]] < 1){
+      data[[i]] <- 1
+    }
+    data[[i]] = round(data[[i]])
+  }
+  return(lapply(data, as.integer))
+}
 
 
+
+##################
 #Initial varibles
 
 data_tables = list()
@@ -196,6 +222,13 @@ data_train = list()
 models = list()
 models_significant = list()
 summaries = NULL
+
+#Prediction vectors
+predictions = list()
+predictions_sig = list()
+cat_pred = list()
+cat_pred_sig = list()
+
 
 # Variable lists
 
@@ -229,8 +262,9 @@ for (i in 1:(files_number)) {
   
   # Dividing the datasets
   train_smp_size <- floor(0.6 * nrow(data_tables[[i]]))
+  test_smp_size <- floor(0.2 * nrow(data_tables[[i]]))
   data_train[[i]] <- data_tables[[i]][1:(train_smp_size-1),]
-  data_test[[i]] <- data_tables[[i]][(train_smp_size + (train_smp_size/2)):nrow(data_tables[[i]]),]
+  data_test[[i]] <- data_tables[[i]][(train_smp_size + (test_smp_size + 1)):nrow(data_tables[[i]]),]
 }
 
 
@@ -252,9 +286,8 @@ for(i in 1:(length(model_names))){
     ## Linear regression model with significant variables
     # Getting significant variables
     sig_variables = row.names(data.frame(summary(models[[i]][[j]])$coef[summary(models[[i]][[j]])$coef[,4] <= .1, 4]))
-    # Removing intercept from list
-    sig_variables = sig_variables[sig_variables != "(Intercept)"]
     
+    # Cleaning the significant variable list
     sig_variables = cleanSignificantVariables(model_variables[[i]], sig_variables)
     
     variables_to_add = paste("+", paste(sig_variables, collapse =" +"), sep="")
@@ -265,6 +298,31 @@ for(i in 1:(length(model_names))){
     # Adding to summaries
     model_name = paste(model_names[i], j, sep=" ")
     model_name = paste("significant", model_name, sep=" ")
-    summaries = getModelMetrics(model_name ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
+    summaries = getModelMetrics(model_name ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
+    
+    
+    ############################
+    #Getting prediction vectors
+    
+    # For normal models
+    if(j==1){
+      predictions[[i]] = list()
+      cat_pred[[i]] = list()
+      predictions_sig[[i]] = list()
+      cat_pred_sig[[i]] = list()
+    }
+    predictions[[i]][[j]] = getPredictionVector(models[[i]][[j]], data_test[[j]])
+    cat_pred[[i]][[j]] = getFactorVectorFromFloat(predictions[[i]][[j]])
+    predictions_sig[[i]][[j]] = getPredictionVector(models_significant[[i]][[j]], data_test[[j]])
+    cat_pred_sig[[i]][[j]] = getFactorVectorFromFloat(predictions_sig[[i]][[j]])
+    
+    
+    
+    
+    predicted = as.factor(unlist(cat_pred[[i]][[j]], use.names=FALSE))
+    real = as.factor(na.omit(
+      remove_missing_levels(fit=models[[i]][[j]], test_data=data_test[[j]]))$point_security)
+    conf <- table(predicted, real)
+    confusion_matrix = confusionMatrix(conf)
   }
 }
