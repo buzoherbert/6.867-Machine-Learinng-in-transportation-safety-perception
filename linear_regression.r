@@ -254,6 +254,18 @@ getConfusionMatrix <- function(pred, test, model){
   return(confusion_matrix)
 }
 
+aggregateConfusionMatrices <- function(conf_mat_list){
+  #Assuming the list is not empty, that all the matrices have the same dimensions and that they are all square matrices
+  dim = nrow(as.table(conf_mat_list[[1]]))
+  sum_matrix = as.matrix(conf_mat_list[[1]])
+  for(i in 2:(length(conf_mat_list))){
+    sum_matrix = sum_matrix + as.matrix(conf_mat_list[[i]])
+  }
+  total = sum(sum_matrix)
+  weighted_matrix = (1/total) * sum_matrix
+  return(weighted_matrix)
+}
+
 
 
 ##################
@@ -274,6 +286,9 @@ cat_pred_sig = list()
 
 conf_mat = list()
 conf_mat_sig = list()
+
+conf_mat_agg = list()
+conf_mat_agg_sig = list()
 
 # Variable lists
 
@@ -364,6 +379,8 @@ for(i in 1:(length(model_names))){
     summaries = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
                                 TRUE, conf_mat_sig[[i]][[j]])
   }
+  conf_mat_agg[[i]] = aggregateConfusionMatrices(conf_mat[[i]])
+  conf_mat_agg_sig[[i]] = aggregateConfusionMatrices(conf_mat_sig[[i]])
 }
 
 # Aggregating data
