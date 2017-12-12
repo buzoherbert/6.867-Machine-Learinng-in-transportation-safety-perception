@@ -335,11 +335,16 @@ for(i in 1:(length(model_names))){
     
     conf_mat[[i]][[j]] = getConfusionMatrix(cat_pred[[i]][[j]], data_test[[j]], models[[i]][[j]])
     conf_mat_sig[[i]][[j]] = getConfusionMatrix(cat_pred_sig[[i]][[j]], data_test[[j]], models_significant[[i]][[j]])
+    # Adding to summaries
+    summaries = getModelMetrics(j, model_names[i] ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+                                FALSE, conf_mat[[i]][[j]])
+    summaries = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+                                TRUE, conf_mat_sig[[i]][[j]])
   }
-  
-  # Adding to summaries
-  summaries = getModelMetrics(j, model_names[i] ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
-                              FALSE, conf_mat[[i]][[j]])
-  summaries = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
-                              TRUE, conf_mat_sig[[i]][[j]])
 }
+
+# Aggregating data
+summaries_aggregated = aggregate(summaries, list(summaries$model), mean)
+
+
+
