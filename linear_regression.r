@@ -2,6 +2,7 @@ install.packages("caTools", dependencies = TRUE)
 install.packages("magrittr")
 install.packages("caret")
 install.packages('e1071', dependencies=TRUE)
+install.packages("data.table")
 
 # For sample splitting
 library("caTools")
@@ -12,6 +13,7 @@ library(magrittr)
 # For confusion matrices
 library("caret")
 library("e1071")
+library(data.table)
 
 interpret_variables <- function(data_frame){
   # Remove unused
@@ -143,11 +145,13 @@ remove_missing_levels <- function(fit, test_data) {
 # Function to get the metrics of each model and add it to the summaries table
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
-getModelMetrics <- function(model_name, linear_model, summaries_table, train_data, test_data) {
+getModelMetrics <- function(file_num, model_name, linear_model, summaries_table, train_data, test_data, 
+                            significant_variables_only, confusion_matrix) {
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
-    summaries_table <- data.frame(matrix(ncol = 9, nrow = 0))
-    names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num")
+    summaries_table <- data.frame(matrix(ncol = 12, nrow = 0))
+    names <- c("model", "file_num", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", 
+               "var_num", "significant", "accuracy")
     colnames(summaries_table) <- names
   }
   
@@ -161,6 +165,7 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   
   i = nrow(summaries_table) + 1
   summaries_table[i, "model"] = model_name
+  summaries_table[i, "file_num"] = file_num
   summaries_table[i, "r2"] = summary(linear_model)$r.squared
   summaries_table[i, "sse"] = SSE
   summaries_table[i, "pred_means"] = pred_mean
@@ -169,7 +174,12 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   summaries_table[i, "rmse"] = RMSE
   summaries_table[i, "mae"] = MAE
   summaries_table[i,"var_num"] = length(names(linear_model$coefficients))
-  
+  if(significant_variables_only){
+    summaries_table[i, "significant"] = TRUE;
+  } else {
+    summaries_table[i, "significant"] = FALSE;
+  }
+  summaries_table[i, "accuracy"] = confusion_matrix$overall['Accuracy']
   return(summaries_table)
 }
 
@@ -216,9 +226,7 @@ getConfusionMatrix <- function(pred, test, model){
   predicted <- ordered(predicted, levels = c("1","2","3","4","5"))
   
   u = union(predicted, real)
-  conf = table(factor(predicted, u), factor(real, u))
-  print(conf)
-  
+  conf = table(ordered(predicted, c("1","2","3","4","5")), ordered(real, c("1","2","3","4","5")))
   confusion_matrix = confusionMatrix(conf)
   return(confusion_matrix)
 }
@@ -279,6 +287,7 @@ for (i in 1:(files_number)) {
   test_smp_size <- floor(0.2 * nrow(data_tables[[i]]))
   data_train[[i]] <- data_tables[[i]][1:(train_smp_size-1),]
   data_test[[i]] <- data_tables[[i]][(train_smp_size + (test_smp_size + 1)):nrow(data_tables[[i]]),]
+  #data_test[[i]] <- data_tables[[i]][(train_smp_size ):nrow(data_tables[[i]]),]
 }
 
 
@@ -291,11 +300,7 @@ for(i in 1:(length(model_names))){
     model_def = paste("data_train[[j]]$point_security ~",variables_to_add, sep="")
     if(j==1){ models[[i]] = list()}
     models[[i]][[j]] = lm(model_def, data = data_train[[j]])
-    
-    # Adding to summaries
-    model_name = paste(model_names[i], j, sep=" ")
-    summaries = getModelMetrics(model_name ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
-    
+   
     ########################
     ## Linear regression model with significant variables
     # Getting significant variables
@@ -308,11 +313,6 @@ for(i in 1:(length(model_names))){
     model_def = paste("data_train[[j]]$point_security ~",variables_to_add, sep="")
     if(j==1){ models_significant[[i]] = list()}
     models_significant[[i]][[j]] = lm(model_def, data = data_train[[j]])
-    
-    # Adding to summaries
-    model_name = paste(model_names[i], j, sep=" ")
-    model_name = paste("significant", model_name, sep=" ")
-    summaries = getModelMetrics(model_name ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
     
     
     ############################
@@ -336,4 +336,10 @@ for(i in 1:(length(model_names))){
     conf_mat[[i]][[j]] = getConfusionMatrix(cat_pred[[i]][[j]], data_test[[j]], models[[i]][[j]])
     conf_mat_sig[[i]][[j]] = getConfusionMatrix(cat_pred_sig[[i]][[j]], data_test[[j]], models_significant[[i]][[j]])
   }
+  
+  # Adding to summaries
+  summaries = getModelMetrics(j, model_names[i] ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+                              FALSE, conf_mat[[i]][[j]])
+  summaries = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+                              TRUE, conf_mat_sig[[i]][[j]])
 }
