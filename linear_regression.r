@@ -142,6 +142,25 @@ remove_missing_levels <- function(fit, test_data) {
 }
 
 
+# Calculating f1 score
+# Source: https://stackoverflow.com/a/36843900
+f1_score <- function(predicted, expected, positive.class="1") {
+  predicted <- as.factor(predicted)
+  expected  <- as.factor(expected)
+  cm = as.matrix(table(expected, predicted))
+  
+  precision <- diag(cm) / colSums(cm)
+  recall <- diag(cm) / rowSums(cm)
+  f1 <-  ifelse(precision + recall == 0, 0, 2 * precision * recall / (precision + recall))
+  
+  #Assuming that F1 is zero when it's not possible compute it
+  f1[is.na(f1)] <- 0
+  
+  #Binary F1 or Multi-class macro-averaged F1
+  ifelse(nlevels(expected) == 2, f1[positive.class], mean(f1))
+}
+
+
 # Function to get the metrics of each model and add it to the summaries table
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
@@ -149,9 +168,9 @@ getModelMetrics <- function(file_num, model_name, linear_model, summaries_table,
                             significant_variables_only, confusion_matrix) {
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
-    summaries_table <- data.frame(matrix(ncol = 12, nrow = 0))
+    summaries_table <- data.frame(matrix(ncol = 13, nrow = 0))
     names <- c("model", "file_num", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", 
-               "var_num", "significant", "accuracy")
+               "var_num", "significant", "accuracy", "f1_score")
     colnames(summaries_table) <- names
   }
   
@@ -180,6 +199,10 @@ getModelMetrics <- function(file_num, model_name, linear_model, summaries_table,
     summaries_table[i, "significant"] = FALSE;
   }
   summaries_table[i, "accuracy"] = confusion_matrix$overall['Accuracy']
+  #Making test and predicted vector same size
+  expected = as.factor(na.omit(
+    remove_missing_levels(fit=linear_model, test_data=test_data))$point_security)
+  summaries_table[i, "f1_score"] = f1_score(pred_data, expected)
   return(summaries_table)
 }
 
@@ -354,5 +377,3 @@ qplot(var_num, osr2, colour = significant, shape = model,
 
 qplot(var_num, r2, colour = significant, shape = model, 
       data = summaries)
-
-
