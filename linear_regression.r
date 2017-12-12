@@ -267,6 +267,18 @@ aggregateConfusionMatrices <- function(conf_mat_list){
 }
 
 
+outputConfusionMatrices <- function(conf_mat_list, filename){
+  append = FALSE
+  for(i in 1:(length(conf_mat_list))){
+    write.table(conf_mat_list[[i]], file = filename, append = append, quote = TRUE, sep = ",",
+                eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+                col.names = FALSE, qmethod = c("escape", "double"),
+                fileEncoding = "")
+    append = TRUE
+  }
+}
+
+
 
 ##################
 #Initial varibles
@@ -307,7 +319,7 @@ time_context = c("haversine", "urban_typology", "total_passenger_count", "total_
 
 model_variables = list(all_variables, sociodemographics, personal_trip, perception, trip_context, time_context)
 
-model_names = c("All variables", "Sociodemographics","Personal trip", "Perception", 
+model_names = c("All variables", "Sociodemographic","Personal trip", "Perception", 
                 "Trip context", "Time context")
 
 
@@ -385,6 +397,11 @@ for(i in 1:(length(model_names))){
 
 # Aggregating data
 summaries_aggregated = aggregate(summaries, list(summaries$model), mean)
+
+#Writing output to files
+folder_name = "./confusions/"
+outputConfusionMatrices(conf_mat_agg, paste(folder_name, "linear_regression.csv", sep=""))
+outputConfusionMatrices(conf_mat_agg_sig, paste(folder_name, "linear_regression_stepwise.csv", sep=""))
 
 
 # Some plots
