@@ -347,4 +347,12 @@ for(i in 1:(length(model_names))){
 summaries_aggregated = aggregate(summaries, list(summaries$model), mean)
 
 
+# Some plots
+library(ggplot2)
+qplot(var_num, osr2, colour = significant, shape = model, 
+      +       data = summaries)
+
+qplot(var_num, r2, colour = significant, shape = model, 
+      data = summaries)
+
 
