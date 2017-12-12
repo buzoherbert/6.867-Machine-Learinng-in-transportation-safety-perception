@@ -1,6 +1,8 @@
 install.packages("caTools", dependencies = TRUE)
 install.packages("magrittr")
-install.packages("class")
+install.packages("caret")
+install.packages('e1071', dependencies=TRUE)
+install.packages("data.table")
 
 # For sample splitting
 library("caTools")
@@ -8,8 +10,10 @@ library("caTools")
 # For removing unused levels in test data
 library(magrittr)
 
-# For knn model
-library("class")
+# For confusion matrices
+library("caret")
+library("e1071")
+library(data.table)
 
 interpret_variables <- function(data_frame){
   # Remove unused
@@ -138,20 +142,39 @@ remove_missing_levels <- function(fit, test_data) {
 }
 
 
+# Calculating f1 score
+# Source: https://stackoverflow.com/a/36843900
+f1_score <- function(predicted, expected, positive.class="1") {
+  predicted <- as.factor(predicted)
+  expected  <- as.factor(expected)
+  cm = as.matrix(table(expected, predicted))
+  
+  precision <- diag(cm) / colSums(cm)
+  recall <- diag(cm) / rowSums(cm)
+  f1 <-  ifelse(precision + recall == 0, 0, 2 * precision * recall / (precision + recall))
+  
+  #Assuming that F1 is zero when it's not possible compute it
+  f1[is.na(f1)] <- 0
+  
+  #Binary F1 or Multi-class macro-averaged F1
+  ifelse(nlevels(expected) == 2, f1[positive.class], mean(f1))
+}
+
+
 # Function to get the metrics of each model and add it to the summaries table
 # It returns the summaries table passed to it with added data about the new model
 # If summaries table doesn't exist, it creates it
-getModelMetrics <- function(model_name, linear_model, summaries_table, train_data, test_data) {
-  test_data = na.omit(remove_missing_levels (fit=linear_model, test_data=test_data))
-  
+getModelMetrics <- function(file_num, model_name, linear_model, summaries_table, train_data, test_data, 
+                            significant_variables_only, confusion_matrix) {
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
-    summaries_table <- data.frame(matrix(ncol = 9, nrow = 0))
-    names <- c("model", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", "var_num")
+    summaries_table <- data.frame(matrix(ncol = 13, nrow = 0))
+    names <- c("model", "file_num", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", 
+               "var_num", "significant", "accuracy", "f1_score")
     colnames(summaries_table) <- names
   }
   
-  pred_data = predict(linear_model, newdata = test_data)
+  pred_data = getPredictionVector(linear_model, test_data)
   SSE = sum((pred_data - test_data$point_security)^2)
   pred_mean = mean(train_data$point_security)
   SST = sum((pred_mean - test_data$point_security)^2)
@@ -161,6 +184,7 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   
   i = nrow(summaries_table) + 1
   summaries_table[i, "model"] = model_name
+  summaries_table[i, "file_num"] = file_num
   summaries_table[i, "r2"] = summary(linear_model)$r.squared
   summaries_table[i, "sse"] = SSE
   summaries_table[i, "pred_means"] = pred_mean
@@ -169,12 +193,23 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
   summaries_table[i, "rmse"] = RMSE
   summaries_table[i, "mae"] = MAE
   summaries_table[i,"var_num"] = length(names(linear_model$coefficients))
-  
+  if(significant_variables_only){
+    summaries_table[i, "significant"] = TRUE;
+  } else {
+    summaries_table[i, "significant"] = FALSE;
+  }
+  summaries_table[i, "accuracy"] = confusion_matrix$overall['Accuracy']
+  #Making test and predicted vector same size
+  expected = as.factor(na.omit(
+    remove_missing_levels(fit=linear_model, test_data=test_data))$point_security)
+  summaries_table[i, "f1_score"] = f1_score(pred_data, expected)
   return(summaries_table)
 }
 
 
 cleanSignificantVariables <- function(original_list, list_to_clean) {
+  # Removing intercept from list
+  list_to_clean = list_to_clean[list_to_clean != "(Intercept)"]
   for(i in 1:(length(list_to_clean))){
     for(j in 1:(length(original_list))){
       if(grepl(original_list[[j]], list_to_clean[[i]])){
@@ -186,8 +221,54 @@ cleanSignificantVariables <- function(original_list, list_to_clean) {
 }
 
 
+getPredictionVector <- function(model, test_data){
+  test_data = na.omit(remove_missing_levels (fit=model, test_data=test_data))
+  pred_data = predict(model, newdata = test_data)
+  return(pred_data)
+}
+
+getFactorVectorFromFloat <- function(data){
+  for(i in 1:(length(data))){
+    if(data[[i]] > 5){
+      data[[i]] <- 5
+    }
+    if(data[[i]] < 1){
+      data[[i]] <- 1
+    }
+    data[[i]] = round(data[[i]])
+  }
+  return(lapply(data, as.integer))
+}
+
+getConfusionMatrix <- function(pred, test, model){
+  predicted = as.factor(unlist(pred, use.names=FALSE))
+  real = as.factor(na.omit(
+    remove_missing_levels(fit=model, test_data=test))$point_security)
+  
+  real <- ordered(real, levels = c("1","2","3","4","5"))
+  predicted <- ordered(predicted, levels = c("1","2","3","4","5"))
+  
+  u = union(predicted, real)
+  conf = table(ordered(predicted, c("1","2","3","4","5")), ordered(real, c("1","2","3","4","5")))
+  confusion_matrix = confusionMatrix(conf)
+  return(confusion_matrix)
+}
+
+aggregateConfusionMatrices <- function(conf_mat_list){
+  #Assuming the list is not empty, that all the matrices have the same dimensions and that they are all square matrices
+  dim = nrow(as.table(conf_mat_list[[1]]))
+  sum_matrix = as.matrix(conf_mat_list[[1]])
+  for(i in 2:(length(conf_mat_list))){
+    sum_matrix = sum_matrix + as.matrix(conf_mat_list[[i]])
+  }
+  total = sum(sum_matrix)
+  weighted_matrix = (1/total) * sum_matrix
+  return(weighted_matrix)
+}
 
 
+
+##################
 #Initial varibles
 
 data_tables = list()
@@ -196,6 +277,18 @@ data_train = list()
 models = list()
 models_significant = list()
 summaries = NULL
+
+#Prediction vectors
+predictions = list()
+predictions_sig = list()
+cat_pred = list()
+cat_pred_sig = list()
+
+conf_mat = list()
+conf_mat_sig = list()
+
+conf_mat_agg = list()
+conf_mat_agg_sig = list()
 
 # Variable lists
 
@@ -229,8 +322,10 @@ for (i in 1:(files_number)) {
   
   # Dividing the datasets
   train_smp_size <- floor(0.6 * nrow(data_tables[[i]]))
+  test_smp_size <- floor(0.2 * nrow(data_tables[[i]]))
   data_train[[i]] <- data_tables[[i]][1:(train_smp_size-1),]
-  data_test[[i]] <- data_tables[[i]][(train_smp_size + (train_smp_size/2)):nrow(data_tables[[i]]),]
+  data_test[[i]] <- data_tables[[i]][(train_smp_size + (test_smp_size + 1)):nrow(data_tables[[i]]),]
+  #data_test[[i]] <- data_tables[[i]][(train_smp_size ):nrow(data_tables[[i]]),]
 }
 
 
@@ -243,18 +338,13 @@ for(i in 1:(length(model_names))){
     model_def = paste("data_train[[j]]$point_security ~",variables_to_add, sep="")
     if(j==1){ models[[i]] = list()}
     models[[i]][[j]] = lm(model_def, data = data_train[[j]])
-    
-    # Adding to summaries
-    model_name = paste(model_names[i], j, sep=" ")
-    summaries = getModelMetrics(model_name ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
-    
+   
     ########################
     ## Linear regression model with significant variables
     # Getting significant variables
     sig_variables = row.names(data.frame(summary(models[[i]][[j]])$coef[summary(models[[i]][[j]])$coef[,4] <= .1, 4]))
-    # Removing intercept from list
-    sig_variables = sig_variables[sig_variables != "(Intercept)"]
     
+    # Cleaning the significant variable list
     sig_variables = cleanSignificantVariables(model_variables[[i]], sig_variables)
     
     variables_to_add = paste("+", paste(sig_variables, collapse =" +"), sep="")
@@ -262,9 +352,50 @@ for(i in 1:(length(model_names))){
     if(j==1){ models_significant[[i]] = list()}
     models_significant[[i]][[j]] = lm(model_def, data = data_train[[j]])
     
+    
+    ############################
+    #Getting prediction vectors
+    
+    # For normal models
+    if(j==1){
+      predictions[[i]] = list()
+      cat_pred[[i]] = list()
+      predictions_sig[[i]] = list()
+      cat_pred_sig[[i]] = list()
+      conf_mat[[i]] = list()
+      conf_mat_sig[[i]] = list()
+    }
+    predictions[[i]][[j]] = getPredictionVector(models[[i]][[j]], data_test[[j]])
+    cat_pred[[i]][[j]] = getFactorVectorFromFloat(predictions[[i]][[j]])
+    
+    predictions_sig[[i]][[j]] = getPredictionVector(models_significant[[i]][[j]], data_test[[j]])
+    cat_pred_sig[[i]][[j]] = getFactorVectorFromFloat(predictions_sig[[i]][[j]])
+    
+    conf_mat[[i]][[j]] = getConfusionMatrix(cat_pred[[i]][[j]], data_test[[j]], models[[i]][[j]])
+    conf_mat_sig[[i]][[j]] = getConfusionMatrix(cat_pred_sig[[i]][[j]], data_test[[j]], models_significant[[i]][[j]])
     # Adding to summaries
-    model_name = paste(model_names[i], j, sep=" ")
-    model_name = paste("significant", model_name, sep=" ")
-    summaries = getModelMetrics(model_name ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
+    summaries = getModelMetrics(j, model_names[i] ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+                                FALSE, conf_mat[[i]][[j]])
+    summaries = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+                                TRUE, conf_mat_sig[[i]][[j]])
   }
+  conf_mat_agg[[i]] = aggregateConfusionMatrices(conf_mat[[i]])
+  conf_mat_agg_sig[[i]] = aggregateConfusionMatrices(conf_mat_sig[[i]])
 }
+
+# Aggregating data
+summaries_aggregated = aggregate(summaries, list(summaries$model), mean)
+
+
+# Some plots
+library(ggplot2)
+qplot(var_num, osr2, colour = significant, shape = model, 
+      +       data = summaries)
+
+qplot(var_num, r2, colour = significant, shape = model, 
+      data = summaries)
+
+
+qplot(var_num, f1_score, data = summaries_aggregated, shape = Group.1)
+qplot(var_num, accuracy, data = summaries_aggregated, shape = Group.1)
+qplot(var_num, sse, data = summaries_aggregated, shape = Group.1)
