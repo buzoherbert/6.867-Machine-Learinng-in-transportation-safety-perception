@@ -174,15 +174,52 @@ getModelMetrics <- function(model_name, linear_model, summaries_table, train_dat
 }
 
 
+cleanSignificantVariables <- function(original_list, list_to_clean) {
+  for(i in 1:(length(list_to_clean))){
+    for(j in 1:(length(original_list))){
+      if(grepl(original_list[[j]], list_to_clean[[i]])){
+        list_to_clean[[i]] = original_list[[j]]
+      }
+    }
+  }
+  return(list_to_clean) 
+}
 
-# loading files
-files_number = 5
+
+
+
+#Initial varibles
 
 data_tables = list()
 data_test = list()
 data_train = list()
 models = list()
+models_significant = list()
 summaries = NULL
+
+# Variable lists
+
+all_variables = c("age", "gender", "education","origin",
+                  "destination", "companions", "trip_purpose",
+                  "mode_security", "importance_safety", "most_safe", "least_safe",
+                  "bus_or_ped", "base_study_zone", "busdestination", "total_seats",
+                  "haversine", "urban_typology", "total_passenger_count", "total_female_count",
+                  "empty_seats", "hour_sin", "hour_cos", "week_day")
+sociodemographics = c("age", "gender", "education")
+personal_trip = c("origin", "destination", "companions", "trip_purpose")
+perception = c("mode_security", "importance_safety", "most_safe", "least_safe")
+trip_context = c("bus_or_ped", "base_study_zone", "busdestination", "total_seats")
+time_context = c("haversine", "urban_typology", "total_passenger_count", "total_female_count",
+                 "empty_seats", "hour_sin", "hour_cos", "week_day")
+
+model_variables = list(all_variables, sociodemographics, personal_trip, perception, trip_context, time_context)
+
+model_names = c("All variables", "Sociodemographics","Personal trip", "Perception", 
+                "Trip context", "Time context")
+
+
+# loading files
+files_number = 5
 for (i in 1:(files_number)) {
   file_name = "final_data_"
   file_name = paste(file_name, i-1, sep="")
@@ -193,102 +230,41 @@ for (i in 1:(files_number)) {
   # Dividing the datasets
   train_smp_size <- floor(0.6 * nrow(data_tables[[i]]))
   data_train[[i]] <- data_tables[[i]][1:(train_smp_size-1),]
-  data_test[[i]] <- data_tables[[i]][(train_smp_size):nrow(data_tables[[i]]),]
-  
-  
-  ########################
-  ## Linear regression model with all the variables
-  models[[i]] = lm(data_train[[i]]$point_security ~., data = data_train[[i]])
-  summary(models[[i]])
-  model_name = paste("Initial model ", i, sep="")
-  summaries = getModelMetrics(model_name ,models[[i]], summaries, data_train[[i]], data_test[[i]])
-  
-  sig_variables = row.names(data.frame(summary(models[[i]])$coef[summary(models[[i]])$coef[,4] <= .1, 4]))
-  
-  
-  model_info = paste("data_train[[i]]$point_security ~",sig_variables, sep="")
-  models[[i]] = lm(model_info, data = data_train[[i]])
-  model_name = paste("Only relevant variables ", i, sep="")
-  summaries = getModelMetrics(model_name ,models[[i]], summaries, data_train[[i]], data_test[[i]])
-  #sig_variables_list = as.vector(sig_variables$Symbol)
-  
-  
+  data_test[[i]] <- data_tables[[i]][(train_smp_size + (train_smp_size/2)):nrow(data_tables[[i]]),]
 }
 
 
-
-
-
-
-
-########################
-## Linear regression model
-
-
-linear_model = lm(train$point_security~., data = train)
-summary(linear_model)
-summaries = getModelMetrics("Initial model",linear_model, NULL, train, test)
-
-
-# Taking out the least relevant variables
-linear_model2 = lm(train$point_security~. 
-                   -inside_or_outside -gender -age -education
-                   -trip_purpose -most_safe -least_safe -bus_or_ped
-                   -base_study_zone -busdestination -total_seats -haversine
-                   -total_passenger_count -total_female_count -empty_seats
-                   , data = train)
-summary(linear_model2)
-summaries = getModelMetrics("Relevant variables",linear_model2, summaries, train, test)
-
-# Only trip variables
-
-linear_model3 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
-summary(linear_model3)
-summaries = getModelMetrics("Trip variables",linear_model3, summaries, train, test)
-
-
-# Only significant variables for the trip
-
-linear_model3a = lm(train$point_security~ +origin +destination, data = train)
-summary(linear_model3a)
-summaries = getModelMetrics("Trip variables - Relevant",linear_model3a, summaries, train, test)
-
-# Only perception variables
-
-linear_model4 = lm(train$point_security~ +mode_security +importance_safety +most_safe +least_safe, data = train)
-summary(linear_model4)
-summaries = getModelMetrics("Perception variables",linear_model4, summaries, train, test)
-
-# Only perception variables
-
-linear_model4a = lm(train$point_security~ +mode_security +importance_safety, data = train)
-summary(linear_model4a)
-summaries = getModelMetrics("Perception variables - relevant",linear_model4a, summaries, train, test)
-
-
-#Only  instant contextual information
-linear_model5 = lm(train$point_security~ +haversine +urban_typology +total_passenger_count
-                   +total_female_count +empty_seats +hour +week_day, data = train)
-summary(linear_model5)
-summaries = getModelMetrics("Instant contextual information",linear_model5, summaries, train, test)
-
-#Only  instant contextual information
-linear_model5a = lm(train$point_security~ +urban_typology, data = train)
-summary(linear_model5a)
-summaries = getModelMetrics("Instant contextual information - relevant",linear_model5a, summaries, train, test)
-
-# Only sociodemographic data
-linear_model6 = lm(train$point_security~ +age +gender +education, data = train)
-summary(linear_model6)
-summaries = getModelMetrics("Sociodemographic data",linear_model6, summaries, train, test)
-
-
-# Only personal trip information
-linear_model7 = lm(train$point_security~ +origin +destination +companions +trip_purpose, data = train)
-summary(linear_model7)
-summaries = getModelMetrics("Personal trip information",linear_model7, summaries, train, test)
-
-
-linear_model7a = lm(train$point_security~ +origin +destination, data = train)
-summary(linear_model7a)
-summaries = getModelMetrics("Personal trip information - relevant",linear_model7a, summaries, train, test)
+# Generating the models
+for(i in 1:(length(model_names))){
+  for (j in 1:(files_number)) {
+    ########################
+    ## Linear regression model with all the variables
+    variables_to_add = paste("+", paste(model_variables[[i]], collapse =" +"), sep="")
+    model_def = paste("data_train[[j]]$point_security ~",variables_to_add, sep="")
+    if(j==1){ models[[i]] = list()}
+    models[[i]][[j]] = lm(model_def, data = data_train[[j]])
+    
+    # Adding to summaries
+    model_name = paste(model_names[i], j, sep=" ")
+    summaries = getModelMetrics(model_name ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
+    
+    ########################
+    ## Linear regression model with significant variables
+    # Getting significant variables
+    sig_variables = row.names(data.frame(summary(models[[i]][[j]])$coef[summary(models[[i]][[j]])$coef[,4] <= .1, 4]))
+    # Removing intercept from list
+    sig_variables = sig_variables[sig_variables != "(Intercept)"]
+    
+    sig_variables = cleanSignificantVariables(model_variables[[i]], sig_variables)
+    
+    variables_to_add = paste("+", paste(sig_variables, collapse =" +"), sep="")
+    model_def = paste("data_train[[j]]$point_security ~",variables_to_add, sep="")
+    if(j==1){ models_significant[[i]] = list()}
+    models_significant[[i]][[j]] = lm(model_def, data = data_train[[j]])
+    
+    # Adding to summaries
+    model_name = paste(model_names[i], j, sep=" ")
+    model_name = paste("significant", model_name, sep=" ")
+    summaries = getModelMetrics(model_name ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]])
+  }
+}
