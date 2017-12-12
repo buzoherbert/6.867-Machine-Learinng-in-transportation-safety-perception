@@ -394,3 +394,8 @@ qplot(var_num, osr2, colour = significant, shape = model,
 
 qplot(var_num, r2, colour = significant, shape = model, 
       data = summaries)
+
+
+qplot(var_num, f1_score, data = summaries_aggregated, shape = Group.1)
+qplot(var_num, accuracy, data = summaries_aggregated, shape = Group.1)
+qplot(var_num, sse, data = summaries_aggregated, shape = Group.1)
