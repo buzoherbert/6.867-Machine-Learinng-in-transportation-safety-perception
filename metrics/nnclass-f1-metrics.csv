@@ -1,4 +1,4 @@
-,sse,osr2,accuracy,f1_score,n_layers
+category,sse,osr2,accuracy,f1_score,n_layers
 All variables,438.4,-0.348111673,0.349189189,0.28810847,1
 Sociodemographic,455,-0.397867544,0.291891892,0.146989073,1
 Trip context,465.4,-0.422482941,0.317837838,0.20072227,1
