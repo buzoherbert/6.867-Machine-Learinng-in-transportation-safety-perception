@@ -169,7 +169,7 @@ getModelMetrics <- function(file_num, model_name, linear_model, summaries_table,
   # If the summaries table is not a data frame, it gets initialized
   if(!is.data.frame(summaries_table)){
     summaries_table <- data.frame(matrix(ncol = 13, nrow = 0))
-    names <- c("model", "file_num", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", 
+    names <- c("category", "file_num", "r2", "sse", "pred_means", "sst", "osr2", "rmse", "mae", 
                "var_num", "significant", "accuracy", "f1_score")
     colnames(summaries_table) <- names
   }
@@ -183,7 +183,7 @@ getModelMetrics <- function(file_num, model_name, linear_model, summaries_table,
   MAE = sum(abs(pred_data - test_data$point_security))/nrow(test_data)
   
   i = nrow(summaries_table) + 1
-  summaries_table[i, "model"] = model_name
+  summaries_table[i, "category"] = model_name
   summaries_table[i, "file_num"] = file_num
   summaries_table[i, "r2"] = summary(linear_model)$r.squared
   summaries_table[i, "sse"] = SSE
@@ -267,6 +267,18 @@ aggregateConfusionMatrices <- function(conf_mat_list){
 }
 
 
+outputConfusionMatrices <- function(conf_mat_list, filename){
+  append = FALSE
+  for(i in 1:(length(conf_mat_list))){
+    write.table(conf_mat_list[[i]], file = filename, append = append, quote = TRUE, sep = ",",
+                eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+                col.names = FALSE, qmethod = c("escape", "double"),
+                fileEncoding = "")
+    append = TRUE
+  }
+}
+
+
 
 ##################
 #Initial varibles
@@ -277,6 +289,7 @@ data_train = list()
 models = list()
 models_significant = list()
 summaries = NULL
+summaries_sig = NULL
 
 #Prediction vectors
 predictions = list()
@@ -307,7 +320,7 @@ time_context = c("haversine", "urban_typology", "total_passenger_count", "total_
 
 model_variables = list(all_variables, sociodemographics, personal_trip, perception, trip_context, time_context)
 
-model_names = c("All variables", "Sociodemographics","Personal trip", "Perception", 
+model_names = c("All variables", "Sociodemographic","Personal trip", "Perception", 
                 "Trip context", "Time context")
 
 
@@ -376,7 +389,7 @@ for(i in 1:(length(model_names))){
     # Adding to summaries
     summaries = getModelMetrics(j, model_names[i] ,models[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
                                 FALSE, conf_mat[[i]][[j]])
-    summaries = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
+    summaries_sig = getModelMetrics(j, model_names[i] ,models_significant[[i]][[j]], summaries, data_train[[j]], data_test[[j]], 
                                 TRUE, conf_mat_sig[[i]][[j]])
   }
   conf_mat_agg[[i]] = aggregateConfusionMatrices(conf_mat[[i]])
@@ -384,7 +397,32 @@ for(i in 1:(length(model_names))){
 }
 
 # Aggregating data
-summaries_aggregated = aggregate(summaries, list(summaries$model), mean)
+summaries_aggregated = aggregate(summaries, list(summaries$category), mean)
+summaries_aggregated$category = summaries_aggregated$Group.1
+summaries_aggregated$Group.1 = NULL
+summaries_sig_aggregated = aggregate(summaries_sig, list(summaries_sig$category), mean)
+summaries_sig_aggregated$category = summaries_sig_aggregated$Group.1
+summaries_sig_aggregated$Group.1 = NULL
+
+#Writing output to files
+conf_folder_name = "./confusions/"
+outputConfusionMatrices(conf_mat_agg, paste(conf_folder_name, "linear_regression.csv", sep=""))
+outputConfusionMatrices(conf_mat_agg_sig, paste(folder_name, "linear_regression_stepwise.csv", sep=""))
+
+metrics_folder_name = "./metrics/"
+
+write.table(summaries_aggregated, file = paste(metrics_folder_name, "linear_regression.csv", sep=""), 
+            append = FALSE, quote = TRUE, sep = ",",
+            eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+            col.names = TRUE, qmethod = c("escape", "double"),
+            fileEncoding = "")
+
+write.table(summaries_sig_aggregated, file = paste(metrics_folder_name, "linear_regression_stepwise.csv", sep=""), 
+            append = FALSE, quote = TRUE, sep = ",",
+            eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+            col.names = TRUE, qmethod = c("escape", "double"),
+            fileEncoding = "")
+
 
 
 # Some plots
