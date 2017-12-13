@@ -19,15 +19,15 @@ TEST_RATIO = 0.2 #float from 0.0 to 1.0
 VAL_RATIO = 0.2 #float from 0.0 to 1.0
 NORMALIZE = True #normalize data in "total_passenger_count", "total_female_count", "empty_seats", "haversine"
 BATCH_SIZE = 5
-INCLUDE = sys.argv[1] #sys.argv[1] #one of "trip_var", "instant_var", "perception_var", "contextual_var", "sociodemographic_var", "ALL"
+INCLUDE = "ALL" #sys.argv[1] #one of "trip_var", "instant_var", "perception_var", "contextual_var", "sociodemographic_var", "ALL"
 ACTIVATION = "relu"
 FILENAMES = ['final_data_0.csv','final_data_1.csv','final_data_2.csv','final_data_3.csv','final_data_4.csv']
 F1METHOD = 'macro'
 NUM_EPOCHS = 50
 M1 = 10
 M2 = None #Set None to remove second layer
-Dropout_rates = [0.0, 0.1, 0.2, 0.3] #[0.0, 0.1, 0.2, 0.3] # set 0.0 to disable dropout
-Regularizations = [0, 0.001, 0.01, 0.1] #[0, 0.001, 0.01, 0.1]
+Dropout_rates = []#[0.0, 0.1, 0.2, 0.3] #[0.0, 0.1, 0.2, 0.3] # set 0.0 to disable dropout
+Regularizations = []#[0, 0.001, 0.01, 0.1] #[0, 0.001, 0.01, 0.1]
 #DDOF = 0
 
 print("M1: ", M1)
@@ -56,7 +56,7 @@ SHOWPLOTS = False
 
 #set COMPARE to true if you want to compare our model with a "mode model" (predict everything to be the most probable perception value)
 # and a "random model" (predict perception value x with probability weighted according to the distribution of perception x occuring)
-COMPARE = False
+COMPARE = True
 
 train_rates = []
 val_rates = []
@@ -312,6 +312,7 @@ if COMPARE:
         mean_prediction_int = np.clip(mean_prediction.round().astype(int), 0, 4)
 
         random_pred = np.array([weighted_random(sums) for i in range(test_y.size)])
+        #random_pred = np.array([randrange(5) for i in range(test_y.size)]) #uniform random
         sse_means.append(sse(test_y, mean_prediction))
         sse_randoms.append(sse(test_y, random_pred))
         osr2_means.append(osr2(test_y, mean_prediction, train_y))

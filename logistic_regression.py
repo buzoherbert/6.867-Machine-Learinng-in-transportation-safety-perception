@@ -9,13 +9,14 @@ import numpy as np
 TEST_RATIO = 0.2 #float from 0.0 to 1.0
 VAL_RATIO = 0.2 #float from 0.0 to 1.0
 NORMALIZE = True #normalize data in "total_passenger_count", "total_female_count", "empty_seats", "haversine"
-INCLUDE = "instant_var" #sys.argv[1] #one of "trip_var", "instant_var", "perception_var", "contextual_var", "sociodemographic_var", "ALL"
+INCLUDE = "ALL" #sys.argv[1] #one of "trip_var", "instant_var", "perception_var", "contextual_var", "sociodemographic_var", "ALL"
 ACTIVATION = "relu"
 FILENAMES = ['final_data_0.csv','final_data_1.csv','final_data_2.csv','final_data_3.csv','final_data_4.csv']
 F1METHOD = 'macro'
-regularization = [10]
+PENALTY = 'l2'
+regularization = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
 
-SHOW_CONFUSIONS = True
+SHOW_CONFUSIONS = False
 
 """
 Accuracy:
@@ -86,7 +87,7 @@ class Model:
         val_f1 = []
         test_f1 = []
 
-        model = LogisticRegression(solver='saga', multi_class='multinomial', C = self.regul)
+        model = LogisticRegression(solver='saga', multi_class='multinomial', C = self.regul, penalty=PENALTY)
         
         model.fit(train_x, train_y)
         predict_train = model.predict(train_x)
